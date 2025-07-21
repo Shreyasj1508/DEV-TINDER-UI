@@ -4,11 +4,11 @@ import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
-import NavBar from "../components/NavBar"; // ✅ Import NavBar
+import NavBar from "../components/NavBar";
 
 const Login = () => {
-  const [emailId, setEmailId] = useState("shreyas45@gmail.com");
-  const [password, setPassword] = useState("Shreyas45@");
+  const [emailId, setEmailId] = useState("shreyas48@gmail.com");
+  const [password, setPassword] = useState("Shreyas48@");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [isLoginForm, setIsLoginForm] = useState(true);

@@ -39,13 +39,14 @@ const NavBar = () => {
               className="btn btn-ghost btn-circle avatar"
             >
               <div className="w-10 rounded-full">
-             <img
-  alt="user photo"
-  src={user.photo || "/default-profile.png"}
-  onError={(e) => (e.target.src = "/default-profile.png")}
-  className="w-10 rounded-full"
-/>
-                console.log(user.photo);
+                <img
+                  alt="user photo"
+                  src={
+                    user.photo.startsWith("http")
+                      ? user.photo
+                      : `${BASE_URL}/${user.photo}`
+                  }
+                />
               </div>
             </div>
             <ul
