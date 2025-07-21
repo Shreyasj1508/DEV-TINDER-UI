@@ -5,13 +5,12 @@ const userSlice = createSlice({
   initialState: null,
   reducers: {
     addUser: (state, action) => {
-      return action.payload;
+      return action.payload; // Make sure action.payload includes photo
     },
-    removeUser: (state, action) => {
-      return null;
-    },
+    removeUser: () => null,
   },
 });
+
 
 export const { addUser, removeUser } = userSlice.actions;
 export default userSlice.reducer;

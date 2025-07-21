@@ -21,7 +21,7 @@ const Login = () => {
       const res = await axios.post(
         BASE_URL + "/login",
         {
-          emailId,
+          email:emailId,
           password,
         },
         { withCredentials: true }

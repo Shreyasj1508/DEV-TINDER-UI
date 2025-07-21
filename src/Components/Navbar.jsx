@@ -6,6 +6,7 @@ import { removeUser } from "../utils/userSlice";
 
 const NavBar = () => {
   const user = useSelector((store) => store.user);
+  console.log(user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -21,7 +22,7 @@ const NavBar = () => {
   };
 
   return (
-   <div className="navbar bg-base-300">
+    <div className="navbar bg-base-300">
       <div className="flex-1">
         <Link to="/" className="btn btn-ghost text-xl">
           👩‍💻 DevTinder
@@ -38,6 +39,7 @@ const NavBar = () => {
             >
               <div className="w-10 rounded-full">
                 <img alt="user photo" src={user.photo} />
+                console.log(user.photo);
               </div>
             </div>
             <ul
