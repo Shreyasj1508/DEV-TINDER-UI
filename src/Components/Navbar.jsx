@@ -6,7 +6,8 @@ import { removeUser } from "../utils/userSlice";
 
 const NavBar = () => {
   const user = useSelector((store) => store.user);
-  console.log(user);
+  console.log(user?.photo);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -38,7 +39,12 @@ const NavBar = () => {
               className="btn btn-ghost btn-circle avatar"
             >
               <div className="w-10 rounded-full">
-                <img alt="user photo" src={user.photo} />
+             <img
+  alt="user photo"
+  src={user.photo || "/default-profile.png"}
+  onError={(e) => (e.target.src = "/default-profile.png")}
+  className="w-10 rounded-full"
+/>
                 console.log(user.photo);
               </div>
             </div>

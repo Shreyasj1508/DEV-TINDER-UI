@@ -21,7 +21,7 @@ const Login = () => {
       const res = await axios.post(
         BASE_URL + "/login",
         {
-          email:emailId,
+          email: emailId,
           password,
         },
         { withCredentials: true }
@@ -37,7 +37,7 @@ const Login = () => {
     try {
       const res = await axios.post(
         BASE_URL + "/signup",
-        { firstName, lastName, emailId, password },
+        { firstName, lastName, email:emailId, password },
         { withCredentials: true }
       );
       dispatch(addUser(res.data.data));
