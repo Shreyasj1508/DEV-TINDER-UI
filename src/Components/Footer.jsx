@@ -16,7 +16,7 @@ const Footer = () => {
         <p className="font-bold">
           DevTinder
           <br />
-          Connecting Developers and Collaborate
+          Connecting Developers and Collaborate 
         </p>
         <p>Copyright © {new Date().getFullYear()} - All right reserved</p>
       </aside>
