@@ -4,6 +4,7 @@ import Login from "./Components/Login";
 import Profile from "./Components/Profile";
 import Feed from "./Components/Feed";
 import "./index.css";
+import Premium from "./Components/Premium";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <Route path="/" element={<Feed />} />
       <Route path="/login" element={<Login />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/premium" element={<Premium />} />
     </Routes>
   );
 }
