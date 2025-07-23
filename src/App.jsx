@@ -5,6 +5,8 @@ import Profile from "./Components/Profile";
 import Feed from "./Components/Feed";
 import "./index.css";
 import Premium from "./Components/Premium";
+import Requests from "./Components/Requests";
+import Connections from "./Components/Connections";
 
 function App() {
   return (
@@ -14,6 +16,8 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/premium" element={<Premium />} />
+      <Route path="/requests" element={<Requests />} />
+      <Route path="/connections" element={<Connections />} />
     </Routes>
   );
 }

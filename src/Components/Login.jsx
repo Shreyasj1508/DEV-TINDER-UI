@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
-import NavBar from "../components/NavBar";
+import NavBar from "./Navbar";
 
 const Login = () => {
   const [emailId, setEmailId] = useState("shreyas48@gmail.com");
@@ -37,7 +37,7 @@ const Login = () => {
     try {
       const res = await axios.post(
         BASE_URL + "/signup",
-        { firstName, lastName, email:emailId, password },
+        { firstName, lastName, email: emailId, password },
         { withCredentials: true }
       );
       dispatch(addUser(res.data.data));
