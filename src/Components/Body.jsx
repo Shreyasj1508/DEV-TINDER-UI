@@ -1,6 +1,5 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
-
 import Footer from "./Footer";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
@@ -34,9 +33,9 @@ const Body = () => {
   }, []);
 
   return (
-    <div>
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50">
       <Navbar />
-      <div className="pt-20 min-h-[80vh]">
+      <div className="pt-20">
         <Outlet />
       </div>
       <Footer />

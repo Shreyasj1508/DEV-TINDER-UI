@@ -1,3 +1,219 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom Animations */
+@keyframes blob {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes swipeLeft {
+  0% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-100vw) rotate(-30deg);
+    opacity: 0;
+  }
+}
+
+@keyframes swipeRight {
+  0% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100vw) rotate(30deg);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-swipe-left {
+  animation: swipeLeft 0.6s ease-in-out forwards;
+}
+
+.animate-swipe-right {
+  animation: swipeRight 0.6s ease-in-out forwards;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 2s ease-in-out infinite;
+}
+
+.animation-delay-0 {
+  animation-delay: 0s;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+/* Card Stack Effect */
+.card-stack {
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+/* Glassmorphism */
+.glass {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, #ec4899, #8b5cf6);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(45deg, #db2777, #7c3aed);
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .animate-blob {
+    animation-duration: 10s;
+  }
+}
+
+/* Button Hover Effects */
+.btn-hover-effect {
+  transition: all 0.3s ease;
+}
+
+.btn-hover-effect:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Card Hover Effects */
+.card-hover-effect {
+  transition: all 0.3s ease;
+}
+
+.card-hover-effect:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Text Gradient Effect */
+.text-gradient {
+  background: linear-gradient(45deg, #ec4899, #8b5cf6, #06b6d4);
+  background-size: 200% 200%;
+  animation: gradient 3s ease infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Loading Animation */
+.loading-dots {
+  display: inline-block;
+}
+
+.loading-dots::after {
+  content: '...';
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0%, 20% {
+    content: '.';
+  }
+  40% {
+    content: '..';
+  }
+  60%, 100% {
+    content: '...';
+  }
+}
+
+/* Smooth Transitions */
+* {
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Focus States */
+button:focus,
+input:focus,
+textarea:focus {
+  outline: 2px solid #ec4899;
+  outline-offset: 2px;
+}
+
+/* Custom Radio/Checkbox */
+input[type="radio"]:checked {
+  background-color: #ec4899;
+  border-color: #ec4899;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #ec4899;
+  border-color: #ec4899;
+}

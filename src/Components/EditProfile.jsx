@@ -48,126 +48,152 @@ const EditProfile = ({ user }) => {
 
   return (
     <>
-      <div className="flex justify-center  my-10 max ">
-        <div className="flex justify-center mx-10 ">
-          <div className="card bg-base-300 w-96 shadow-xl">
-            <div className="card-body">
-              <h2 className="card-title justify-center">Edit Profile</h2>
-              <div>
-                <label className="form-control w-full max-w-xs my-2">
-                  <div className="label">
-                    <span className="label-text">First Name</span>
-                  </div>
-                  <input
-                    type="text"
-                    value={firstName}
-                    onChange={(e) => setFirstname(e.target.value)}
-                    className="input input-bordered w-full max-w-xs"
-                  />
-                </label>
-                <label className="form-control w-full max-w-xs my-2">
-                  <div className="label">
-                    <span className="label-text">Last Name</span>
-                  </div>
-                  <input
-                    type="text"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    className="input input-bordered w-full max-w-xs"
-                  />
-                </label>
-                <label className="form-control w-full max-w-xs my-2">
-                  <div className="label">
-                    <span className="label-text">Age</span>
-                  </div>
-                  <input
-                    type="text"
-                    value={age}
-                    onChange={(e) => setAge(e.target.value)}
-                    className="input input-bordered w-full max-w-xs"
-                  />
-                </label>
-                <label className="form-control w-full max-w-xs my-2">
-                  <div className="label">
-                    <span className="label-text">PhotoURL</span>
-                  </div>
-                  <input
-                    type="text"
-                    value={photoURL}
-                    onChange={(e) => setPhotoURL(e.target.value)}
-                    className="input input-bordered w-full max-w-xs"
-                  />
-                </label>
-                <label className="form-control w-full max-w-xs my-2">
-                  <div className="label">
-                    <span className="label-text">Gender</span>
-                  </div>
-                  <div className="dropdown">
-                    <div tabIndex={0} role="button" className="btn m-1">
-                      {gender || "Select gender"}
-                    </div>
-                    <ul
-                      tabIndex={0}
-                      className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
-                    >
-                      <li>
-                        <button onClick={() => setGender("Male")}>Male</button>
-                      </li>
-                      <li>
-                        <button onClick={() => setGender("Female")}>
-                          Female
-                        </button>
-                      </li>
-                      <li>
-                        <button onClick={() => setGender("Others")}>
-                          Others
-                        </button>
-                      </li>
-                    </ul>
-                  </div>
-                </label>
-                <label className="form-control w-full max-w-xs my-2">
-                  <div className="label">
-                    <span className="label-text">Skills</span>
-                  </div>
-                  <input
-                    type="text"
-                    value={skills}
-                    onChange={(e) => setSkills(e.target.value.split(","))}
-                    className="input input-bordered w-full max-w-xs"
-                  />
-                </label>
+      <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-50 to-indigo-100 py-8">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent mb-2">
+              Edit Your Profile
+            </h1>
+            <p className="text-gray-600 text-lg">Update your information to attract the right connections</p>
+          </div>
 
-                <label className="form-control w-full max-w-xs my-2">
-                  <div className="label">
-                    <span className="label-text">About</span>
+          <div className="flex flex-col lg:flex-row gap-8 max-w-6xl mx-auto">
+            {/* Form Section */}
+            <div className="lg:w-1/2">
+              <div className="bg-white rounded-3xl shadow-2xl p-8">
+                <div className="space-y-6">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        First Name
+                      </label>
+                      <input
+                        type="text"
+                        value={firstName}
+                        onChange={(e) => setFirstname(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-200 transition-all duration-200 outline-none"
+                        placeholder="John"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Last Name
+                      </label>
+                      <input
+                        type="text"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-200 transition-all duration-200 outline-none"
+                        placeholder="Doe"
+                      />
+                    </div>
                   </div>
-                  <textarea
-                    placeholder="Bio"
-                    type="text"
-                    value={about}
-                    onChange={(e) => setAbout(e.target.value)}
-                    className="input input-bordered w-full max-w-xs"
-                  ></textarea>
-                </label>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Age
+                      </label>
+                      <input
+                        type="number"
+                        value={age}
+                        onChange={(e) => setAge(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-200 transition-all duration-200 outline-none"
+                        placeholder="25"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Gender
+                      </label>
+                      <select
+                        value={gender}
+                        onChange={(e) => setGender(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-200 transition-all duration-200 outline-none"
+                      >
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Others">Others</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Profile Photo URL
+                    </label>
+                    <input
+                      type="url"
+                      value={photoURL}
+                      onChange={(e) => setPhotoURL(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-200 transition-all duration-200 outline-none"
+                      placeholder="https://example.com/your-photo.jpg"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Skills (comma separated)
+                    </label>
+                    <input
+                      type="text"
+                      value={Array.isArray(skills) ? skills.join(", ") : skills}
+                      onChange={(e) => setSkills(e.target.value.split(",").map(skill => skill.trim()))}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-200 transition-all duration-200 outline-none"
+                      placeholder="JavaScript, React, Node.js, Python"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      About You
+                    </label>
+                    <textarea
+                      rows="4"
+                      value={about}
+                      onChange={(e) => setAbout(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-200 transition-all duration-200 outline-none resize-none"
+                      placeholder="Tell us about yourself, your interests, and what you're looking for..."
+                    />
+                  </div>
+
+                  {error && (
+                    <div className="p-4 bg-red-100 border border-red-300 text-red-700 rounded-xl text-sm">
+                      {error}
+                    </div>
+                  )}
+
+                  <button
+                    className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transform transition-all duration-200 hover:scale-105 active:scale-95"
+                    onClick={saveProfile}
+                  >
+                    Save Profile
+                  </button>
+                </div>
               </div>
-              <p className="text-red-500 text-center">{error}</p>
-              <div className="card-actions justify-center mt-2">
-                <button className="btn btn-primary" onClick={saveProfile}>
-                  Save Profile
-                </button>
+            </div>
+
+            {/* Preview Section */}
+            <div className="lg:w-1/2 flex justify-center">
+              <div className="sticky top-8">
+                <h3 className="text-2xl font-bold text-gray-800 mb-4 text-center">Preview</h3>
+                <UserCard
+                  user={{ firstName, lastName, photoURL, about, age, gender, skills }}
+                />
               </div>
             </div>
           </div>
         </div>
-        <UserCard
-          user={{ firstName, lastName, photoURL, about, age, gender, skills }}
-        />
       </div>
+
       {showToast && (
-        <div className="toast toast-top toast-center pt-20 ">
-          <div className="alert alert-success">
-            <span>Profile saved successfully</span>
+        <div className="fixed top-4 right-4 z-50 animate-slide-in">
+          <div className="bg-green-500 text-white px-6 py-4 rounded-xl shadow-lg flex items-center">
+            <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+            Profile saved successfully!
           </div>
         </div>
       )}
