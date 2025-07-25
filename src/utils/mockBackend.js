@@ -4,6 +4,18 @@ import { MOCK_USER } from './constants';
 // Mock data storage (in a real app, this would be a database)
 let mockDatabase = {
   users: [
+    // Default login user for testing
+    {
+      _id: "shreyas-user-123",
+      firstName: "Shreyas",
+      lastName: "Joshi",
+      emailId: "shreyas50@gmail.com",
+      age: 25,
+      gender: "male",
+      about: "Full-stack developer building amazing web applications. Passionate about React and Node.js!",
+      photoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop&crop=face",
+      skills: ["React", "Node.js", "JavaScript", "MongoDB", "Express", "TypeScript"]
+    },
     MOCK_USER,
     {
       _id: "user-001",
@@ -115,11 +127,15 @@ export const mockBackendAPI = {
   login: async (email, password) => {
     await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
     
+    console.log("Mock login attempt with email:", email); // Debug log
+    console.log("Available users:", mockDatabase.users.map(u => u.emailId)); // Debug log
+    
     const user = mockDatabase.users.find(u => u.emailId === email);
     if (user) {
+      console.log("User found:", user); // Debug log
       return { success: true, data: user };
     }
-    throw new Error("Invalid credentials");
+    throw new Error("Invalid credentials - Email not found in mock database");
   },
 
   signup: async (userData) => {

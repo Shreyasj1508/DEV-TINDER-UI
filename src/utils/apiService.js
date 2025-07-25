@@ -4,7 +4,7 @@ import { BASE_URL } from './constants';
 import { mockBackendAPI, isDevelopmentMode } from './mockBackend';
 
 // Configuration
-const USE_MOCK_BACKEND = false; // Your real backend is ready!
+let USE_MOCK_BACKEND = false; // Temporarily using mock backend since real backend is not running
 
 // Axios instance for real backend calls
 const apiClient = axios.create({

@@ -19,13 +19,18 @@ const Login = () => {
     try {
       setLoading(true);
       setError("");
+      
+      console.log("Attempting login with:", emailId); // Debug log
+      
       const response = await apiService.login(emailId, password);
 
       if (response.success) {
+        console.log("Login successful:", response.data); // Debug log
         dispatch(addUser(response.data));
         navigate("/");
       }
     } catch (err) {
+      console.error("Login error:", err); // Debug log
       setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
