@@ -8,8 +8,12 @@ import UserCard from "./userCard";
 const Feed = () => {
   const dispatch = useDispatch();
   const feed = useSelector((store) => store.feed);
+  const user = useSelector((store) => store.user);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [swipeStats, setSwipeStats] = useState({ likes: 0, passes: 0 });
+  const [showStats, setShowStats] = useState(false);
+  const [recentAction, setRecentAction] = useState(null);
 
   const getFeed = async () => {
     if (feed && feed.length > 0) return;
@@ -23,6 +27,11 @@ const Feed = () => {
       dispatch(addFeed(response.data.data));
     } catch (err) {
       console.log("Error fetching feed:", err);
+      // Fallback to mock data if backend fails
+      if (err.response?.status === 401) {
+        console.log("Using fallback mock data");
+        // You can add mock data here if needed for development
+      }
     }
   };
 
@@ -31,10 +40,46 @@ const Feed = () => {
     
     setIsAnimating(true);
     
+    // Update stats and show recent action
+    if (direction === 'right') {
+      setSwipeStats(prev => ({ ...prev, likes: prev.likes + 1 }));
+      setRecentAction({ type: 'like', text: '💖 Liked!' });
+    } else {
+      setSwipeStats(prev => ({ ...prev, passes: prev.passes + 1 }));
+      setRecentAction({ type: 'pass', text: '👋 Passed' });
+    }
+    
+    // Show action feedback
+    setTimeout(() => setRecentAction(null), 2000);
+    
     setTimeout(() => {
       dispatch(removeUserFromFeed(userId));
       setIsAnimating(false);
     }, 300);
+  };
+
+  const handleSuperLike = async (userId) => {
+    if (isAnimating) return;
+    
+    try {
+      setIsAnimating(true);
+      await axios.post(
+        BASE_URL + "/request/send/interested/" + userId,
+        { superLike: true },
+        { withCredentials: true }
+      );
+      
+      setRecentAction({ type: 'superlike', text: '⭐ Super Liked!' });
+      setTimeout(() => setRecentAction(null), 2000);
+      
+      setTimeout(() => {
+        dispatch(removeUserFromFeed(userId));
+        setIsAnimating(false);
+      }, 300);
+    } catch (err) {
+      console.log("Super like error:", err);
+      setIsAnimating(false);
+    }
   };
 
   useEffect(() => {
@@ -42,23 +87,65 @@ const Feed = () => {
     getFeed();
   }, []);
 
+  // Auto-refresh feed when empty
+  useEffect(() => {
+    if (feed && feed.length === 0) {
+      const timer = setTimeout(() => {
+        getFeed();
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [feed]);
+
   console.log("Feed state:", feed, "Is array:", Array.isArray(feed), "Length:", feed?.length);
 
   if (!Array.isArray(feed)) return null;
 
   if (feed.length <= 0)
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-8xl mb-6">💔</div>
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">No more matches!</h1>
-          <p className="text-xl text-gray-600 mb-8">Check back later for new developers</p>
+      <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-50 to-indigo-100 flex items-center justify-center relative overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-10 w-32 h-32 bg-pink-300 rounded-full blur-xl animate-pulse opacity-60"></div>
+          <div className="absolute bottom-20 right-10 w-40 h-40 bg-purple-300 rounded-full blur-xl animate-bounce opacity-40"></div>
+          <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-blue-300 rounded-full blur-xl animate-ping opacity-30"></div>
+        </div>
+        
+        <div className="text-center relative z-10">
+          <div className="text-8xl mb-6 animate-bounce">💔</div>
+          <h1 className="text-4xl font-bold text-gray-800 mb-4 animate-fade-in">No more matches!</h1>
+          <p className="text-xl text-gray-600 mb-8 animate-fade-in-delay">Check back later for new developers</p>
+          
+          {/* Loading Animation */}
+          <div className="flex items-center justify-center gap-2 mb-6">
+            <div className="w-3 h-3 bg-pink-500 rounded-full animate-bounce"></div>
+            <div className="w-3 h-3 bg-purple-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+            <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+          </div>
+          
           <button 
             onClick={getFeed}
-            className="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full font-semibold hover:from-pink-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-105"
+            className="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full font-semibold hover:from-pink-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
           >
-            Refresh Feed
+            🔄 Refresh Feed
           </button>
+          
+          {/* Fun Stats */}
+          {(swipeStats.likes > 0 || swipeStats.passes > 0) && (
+            <div className="mt-8 p-4 bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/40">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Your Session Stats</h3>
+              <div className="flex gap-6 justify-center">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-pink-500">{swipeStats.likes}</div>
+                  <div className="text-sm text-gray-600">Likes</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-500">{swipeStats.passes}</div>
+                  <div className="text-sm text-gray-600">Passes</div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -76,17 +163,57 @@ const Feed = () => {
       </div>
 
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen py-4 md:py-8 px-4">
-        {/* Header */}
+        {/* Action Feedback Overlay */}
+        {recentAction && (
+          <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 animate-bounce">
+            <div className={`px-6 py-3 rounded-full font-bold text-white shadow-lg ${
+              recentAction.type === 'like' ? 'bg-green-500' : 
+              recentAction.type === 'superlike' ? 'bg-blue-500' : 'bg-red-500'
+            }`}>
+              {recentAction.text}
+            </div>
+          </div>
+        )}
+
+        {/* Header with Enhanced Stats */}
         <div className="mb-6 md:mb-8 text-center">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent mb-2">
             Discover Developers
           </h1>
           <p className="text-gray-600 text-base md:text-lg">Find your perfect coding partner</p>
-          <div className="mt-3 md:mt-4 flex items-center justify-center gap-2">
+          <div className="mt-3 md:mt-4 flex items-center justify-center gap-2 flex-wrap">
             <div className="px-3 md:px-4 py-1.5 md:py-2 bg-white/70 backdrop-blur-sm rounded-full text-xs md:text-sm font-medium text-gray-700 shadow-sm">
               📍 {feed.length} developer{feed.length !== 1 ? 's' : ''} remaining
             </div>
+            {user?.firstName && (
+              <div className="px-3 md:px-4 py-1.5 md:py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full text-xs md:text-sm font-medium shadow-sm">
+                👋 Hi {user.firstName}!
+              </div>
+            )}
+            <button
+              onClick={() => setShowStats(!showStats)}
+              className="px-3 md:px-4 py-1.5 md:py-2 bg-blue-500/70 backdrop-blur-sm rounded-full text-xs md:text-sm font-medium text-white shadow-sm hover:bg-blue-600/70 transition-all"
+            >
+              📊 Stats
+            </button>
           </div>
+          
+          {/* Stats Panel */}
+          {showStats && (
+            <div className="mt-4 p-4 bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/40 max-w-sm mx-auto animate-fade-in">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Session Stats</h3>
+              <div className="flex gap-6 justify-center">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-pink-500">{swipeStats.likes}</div>
+                  <div className="text-sm text-gray-600">💖 Likes</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-500">{swipeStats.passes}</div>
+                  <div className="text-sm text-gray-600">👋 Passes</div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Card Stack Container */}
@@ -108,34 +235,7 @@ const Feed = () => {
 
           {/* Main Card */}
           <div className="relative z-10">
-            <UserCard 
-              user={currentUser} 
-              onSwipe={handleSwipe}
-              isAnimating={isAnimating}
-            />
-          </div>
-        </div>
-
-        {/* Instructions */}
-        <div className="mt-6 md:mt-8 text-center">
-          <p className="text-gray-600 text-xs md:text-sm mb-3 md:mb-4">Swipe right to connect, left to pass</p>
-          <div className="flex items-center justify-center gap-6 md:gap-8">
-            <div className="flex items-center gap-2 text-red-500">
-              <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-red-100 flex items-center justify-center border border-red-200">
-                <svg className="w-3 h-3 md:w-4 md:h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <span className="text-xs md:text-sm font-medium">Pass</span>
-            </div>
-            <div className="flex items-center gap-2 text-pink-500">
-              <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-pink-100 flex items-center justify-center border border-pink-200">
-                <svg className="w-3 h-3 md:w-4 md:h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <span className="text-xs md:text-sm font-medium">Connect</span>
-            </div>
+            <UserCard user={currentUser} />
           </div>
         </div>
       </div>

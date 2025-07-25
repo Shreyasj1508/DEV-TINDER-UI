@@ -48,22 +48,25 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-50 to-indigo-100 flex items-center justify-center py-12 px-4 relative overflow-hidden">
-      {/* Background Animation */}
+      {/* Enhanced Background Animation */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-10 -left-10 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
-        <div className="absolute -top-10 -right-10 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse animation-delay-2000"></div>
-        <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 w-80 h-80 bg-indigo-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse animation-delay-4000"></div>
+        <div className="absolute -top-10 -left-10 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+        <div className="absolute -top-10 -right-10 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 w-80 h-80 bg-indigo-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+        
+        {/* Floating Hearts */}
+        <div className="absolute top-20 left-20 text-pink-400 text-2xl animate-float">💖</div>
+        <div className="absolute top-40 right-32 text-purple-400 text-xl animate-float animation-delay-2000">🔥</div>
+        <div className="absolute bottom-32 left-32 text-blue-400 text-lg animate-float animation-delay-4000">⚡</div>
       </div>
 
-      <div className="relative z-10 bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-white/20">
-        {/* Header */}
+      <div className="relative z-10 bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-white/20 animate-card-pop">
+        {/* Enhanced Header */}
         <div className="relative bg-gradient-to-r from-pink-500 via-red-500 to-orange-500 px-8 py-8 text-center">
           <div className="absolute inset-0 bg-black/10"></div>
           <div className="relative z-10">
-            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-              </svg>
+            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4 animate-heart-beat">
+              <span className="text-2xl">🔥</span>
             </div>
             <h2 className="text-3xl font-bold text-white drop-shadow-lg">
               {isLoginForm ? "Welcome Back!" : "Join DevTinder"}
@@ -71,6 +74,22 @@ const Login = () => {
             <p className="text-white/90 mt-2 drop-shadow-md">
               {isLoginForm ? "Sign in to find your coding match" : "Create your developer profile"}
             </p>
+            
+            {/* Fun Stats */}
+            <div className="mt-4 flex justify-center gap-4 text-white/80 text-xs">
+              <div className="text-center">
+                <div className="font-bold">10K+</div>
+                <div>Developers</div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold">5K+</div>
+                <div>Matches</div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold">2K+</div>
+                <div>Projects</div>
+              </div>
+            </div>
           </div>
         </div>
 
