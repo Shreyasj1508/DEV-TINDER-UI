@@ -4,11 +4,10 @@ import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
-import NavBar from "./Navbar";
 
 const Login = () => {
-  const [emailId, setEmailId] = useState("shreyas48@gmail.com");
-  const [password, setPassword] = useState("Shreyas48@");
+  const [emailId, setEmailId] = useState("shreyas50@gmail.com");
+  const [password, setPassword] = useState("Shreyas50@");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [isLoginForm, setIsLoginForm] = useState(true);
@@ -48,14 +47,12 @@ const Login = () => {
   };
 
   return (
-    <>
-      <NavBar /> {/* ✅ NavBar shown at top */}
-      <div className="flex justify-center my-10">
-        <div className="card bg-base-300 w-96 shadow-xl">
-          <div className="card-body">
-            <h2 className="card-title justify-center">
-              {isLoginForm ? "Login" : "Sign Up"}
-            </h2>
+    <div className="flex justify-center my-10">
+      <div className="card bg-base-300 w-96 shadow-xl">
+        <div className="card-body">
+          <h2 className="card-title justify-center">
+            {isLoginForm ? "Login" : "Sign Up"}
+          </h2>
             <div>
               {!isLoginForm && (
                 <>
@@ -126,7 +123,6 @@ const Login = () => {
           </div>
         </div>
       </div>
-    </>
   );
 };
 
