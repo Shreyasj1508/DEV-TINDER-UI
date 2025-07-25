@@ -1,9 +1,8 @@
 import { useState } from "react";
-import axios from "axios";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { useNavigate } from "react-router-dom";
-import { BASE_URL } from "../utils/constants";
+import { apiService } from "../utils/apiService";
 
 const Login = () => {
   const [emailId, setEmailId] = useState("shreyas50@gmail.com");
@@ -12,37 +11,46 @@ const Login = () => {
   const [lastName, setLastName] = useState("");
   const [isLoginForm, setIsLoginForm] = useState(true);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
-      const res = await axios.post(
-        BASE_URL + "/login",
-        {
-          email: emailId,
-          password,
-        },
-        { withCredentials: true }
-      );
-      dispatch(addUser(res.data));
-      return navigate("/");
+      setLoading(true);
+      setError("");
+      const response = await apiService.login(emailId, password);
+      
+      if (response.success) {
+        dispatch(addUser(response.data));
+        navigate("/");
+      }
     } catch (err) {
-      setError(err?.response?.data || "Something went wrong");
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSignUp = async () => {
     try {
-      const res = await axios.post(
-        BASE_URL + "/signup",
-        { firstName, lastName, email: emailId, password },
-        { withCredentials: true }
-      );
-      dispatch(addUser(res.data.data));
-      return navigate("/profile");
+      setLoading(true);
+      setError("");
+      const response = await apiService.signup({
+        firstName,
+        lastName,
+        email: emailId,
+        password
+      });
+      
+      if (response.success) {
+        dispatch(addUser(response.data));
+        navigate("/profile");
+      }
     } catch (err) {
-      setError(err?.response?.data || "Something went wrong");
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -173,13 +181,22 @@ const Login = () => {
           <button
             className="w-full mt-8 bg-gradient-to-r from-pink-500 via-red-500 to-orange-500 hover:from-pink-600 hover:via-red-600 hover:to-orange-600 text-white font-bold py-4 px-6 rounded-xl shadow-xl transform transition-all duration-300 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={isLoginForm ? handleLogin : handleSignUp}
-            disabled={!emailId || !password || (!isLoginForm && (!firstName || !lastName))}
+            disabled={loading || !emailId || !password || (!isLoginForm && (!firstName || !lastName))}
           >
             <div className="flex items-center justify-center space-x-2">
-              <span>{isLoginForm ? "Sign In" : "Create Account"}</span>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
+              {loading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>{isLoginForm ? "Signing In..." : "Creating Account..."}</span>
+                </>
+              ) : (
+                <>
+                  <span>{isLoginForm ? "Sign In" : "Create Account"}</span>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </>
+              )}
             </div>
           </button>
 

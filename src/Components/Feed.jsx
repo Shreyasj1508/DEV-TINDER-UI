@@ -1,9 +1,9 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { BASE_URL } from "../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { addFeed, removeUserFromFeed } from "../utils/feedSlice";
 import UserCard from "./userCard";
+import { apiService } from "../utils/apiService";
+import LoadingSpinner from "./LoadingSpinner";
 
 const Feed = () => {
   const dispatch = useDispatch();
@@ -14,24 +14,35 @@ const Feed = () => {
   const [swipeStats, setSwipeStats] = useState({ likes: 0, passes: 0 });
   const [showStats, setShowStats] = useState(false);
   const [recentAction, setRecentAction] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const getFeed = async () => {
-    if (feed && feed.length > 0) return;
+    if (feed && feed.length > 0) {
+      setLoading(false);
+      return;
+    }
     
     try {
+      setLoading(true);
+      setError(null);
       console.log("Fetching feed...");
-      const response = await axios.get(BASE_URL + "/user/feed", {
-        withCredentials: true,
-      });
-      console.log("Feed response:", response.data);
-      dispatch(addFeed(response.data.data));
+      const response = await apiService.getFeed();
+      
+      if (response.success) {
+        console.log("Feed response:", response.data);
+        dispatch(addFeed(response.data));
+      }
     } catch (err) {
       console.log("Error fetching feed:", err);
-      // Fallback to mock data if backend fails
+      setError(err.message);
+      // Fallback to mock data if API fails
       if (err.response?.status === 401) {
         console.log("Using fallback mock data");
         // You can add mock data here if needed for development
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -63,11 +74,7 @@ const Feed = () => {
     
     try {
       setIsAnimating(true);
-      await axios.post(
-        BASE_URL + "/request/send/interested/" + userId,
-        { superLike: true },
-        { withCredentials: true }
-      );
+      await apiService.sendConnectionRequest("interested", userId);
       
       setRecentAction({ type: 'superlike', text: '⭐ Super Liked!' });
       setTimeout(() => setRecentAction(null), 2000);
@@ -98,6 +105,32 @@ const Feed = () => {
   }, [feed]);
 
   console.log("Feed state:", feed, "Is array:", Array.isArray(feed), "Length:", feed?.length);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-50 to-indigo-100 flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">⚠️</div>
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">Error Loading Feed</h1>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button 
+            onClick={getFeed}
+            className="px-6 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full font-semibold hover:from-pink-600 hover:to-purple-600 transition-all duration-300"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (!Array.isArray(feed)) return null;
 

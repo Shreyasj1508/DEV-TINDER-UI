@@ -1,11 +1,11 @@
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import NavBar from "./Navbar";
 import Footer from "./Footer";
-import axios from "axios";
-import { BASE_URL } from "../utils/constants";
+import DevConfig from "./DevConfig";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { useEffect, useState } from "react";
+import { apiService } from "../utils/apiService";
 
 const Body = () => {
   const dispatch = useDispatch();
@@ -20,13 +20,14 @@ const Body = () => {
     
     try {
       setIsLoading(true);
-      const res = await axios.get(BASE_URL + "/profile/view", {
-        withCredentials: true,
-      });
-      dispatch(addUser(res.data));
-      setAuthChecked(true);
+      const response = await apiService.getProfile();
+      
+      if (response.success) {
+        dispatch(addUser(response.data));
+        setAuthChecked(true);
+      }
     } catch (err) {
-      if (err?.response?.status === 401) {
+      if (err.message.includes('401') || err.message.includes('Unauthorized')) {
         // Only redirect to login if not already on login page
         if (location.pathname !== "/login") {
           navigate("/login");
@@ -68,6 +69,7 @@ const Body = () => {
         <Outlet />
       </div>
       <Footer />
+      <DevConfig />
     </div>
   );
 };

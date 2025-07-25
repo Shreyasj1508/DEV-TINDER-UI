@@ -4,6 +4,9 @@ export const BASE_URL =
 // Development mode flag
 export const IS_DEV = import.meta.env.DEV;
 
+// Mock backend status
+export const USING_MOCK_BACKEND = false; // Real backend is being used
+
 // Mock user data for development
 export const MOCK_USER = {
   _id: "dev-user-123",

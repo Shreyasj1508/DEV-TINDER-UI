@@ -1,12 +1,12 @@
-import axios from "axios";
 import React, { useState } from "react";
-import { BASE_URL } from "../utils/constants";
 import { useDispatch } from "react-redux";
 import { removeUserFromFeed } from "../utils/feedSlice";
+import { apiService } from "../utils/apiService";
 
 const UserCard = ({ user }) => {
   const dispatch = useDispatch();
   const [isAnimating, setIsAnimating] = useState(false);
+  const [error, setError] = useState(null);
   
   if (!user) return null;
   
@@ -16,28 +16,31 @@ const UserCard = ({ user }) => {
     if (isAnimating) return;
     
     setIsAnimating(true);
+    setError(null);
     
     try {
-      const res = await axios.post(
-        BASE_URL + "/request/send/" + status + "/" + userId,
-        {},
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await apiService.sendConnectionRequest(status, userId);
       
-      setTimeout(() => {
-        dispatch(removeUserFromFeed(userId));
-      }, 300);
+      if (response.success) {
+        setTimeout(() => {
+          dispatch(removeUserFromFeed(userId));
+        }, 300);
+      }
       
     } catch (error) {
-      console.log(error);
+      console.error("Error sending request:", error);
+      setError(error.message);
       setIsAnimating(false);
     }
   };
 
   return (
     <div className="relative w-96 h-[600px] bg-white rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-3xl">
+      {error && (
+        <div className="absolute top-4 left-4 right-4 bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded-lg text-sm z-10">
+          {error}
+        </div>
+      )}
       {/* Main Image */}
       <div className="relative h-[70%] overflow-hidden">
         <img 

@@ -1,22 +1,30 @@
 import { useDispatch } from "react-redux";
 import { removeUserFromFeed } from "../utils/feedSlice";
-import { BASE_URL } from "../utils/constants";
-import axios from "axios";
+import { apiService } from "../utils/apiService";
+import { useState } from "react";
 
 const UserCard = ({ user }) => {
   const dispatch = useDispatch();
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [error, setError] = useState(null);
   const { _id, firstName, lastName, photoUrl, about, skills } = user;
 
   const handleSendRequest = async (status, userId) => {
+    if (isAnimating) return;
+    
+    setIsAnimating(true);
+    setError(null);
+    
     try {
-      const res = await axios.post(
-        BASE_URL + "/request/send/" + status + "/" + userId,
-        {},
-        { withCredentials: true }
-      );
-      dispatch(removeUserFromFeed(userId));
+      const response = await apiService.sendConnectionRequest(status, userId);
+      
+      if (response.success) {
+        dispatch(removeUserFromFeed(userId));
+      }
     } catch (err) {
       console.error("Error sending request:", err);
+      setError(err.message);
+      setIsAnimating(false);
     }
   };
 
