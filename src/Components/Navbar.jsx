@@ -2,12 +2,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { removeUser } from "../utils/userSlice";
 import { apiService } from "../utils/apiService";
+import { useRequestsCount } from "../utils/useRequestsCount";
+import NotificationBadge from "./NotificationBadge";
 
 const NavBar = () => {
   const user = useSelector((store) => store.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const { requestsCount } = useRequestsCount();
 
   const handleLogout = async () => {
     try {
@@ -81,7 +84,7 @@ const NavBar = () => {
 
               <Link
                 to="/requests"
-                className={`hidden lg:flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-200 ${
+                className={`hidden lg:flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-200 relative ${
                   isActive('/requests') 
                     ? 'bg-gradient-to-r from-pink-100 to-red-100 text-pink-600 shadow-sm' 
                     : 'text-gray-600 hover:bg-gray-100'
@@ -91,20 +94,7 @@ const NavBar = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                 </svg>
                 <span className="font-medium">Requests</span>
-              </Link>
-
-              <Link
-                to="/chat"
-                className={`hidden lg:flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-200 ${
-                  isActive('/chat') 
-                    ? 'bg-gradient-to-r from-pink-100 to-red-100 text-pink-600 shadow-sm' 
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-                <span className="font-medium">Chats</span>
+                <NotificationBadge count={requestsCount} />
               </Link>
 
               {/* Mobile Navigation Icons */}
@@ -121,16 +111,11 @@ const NavBar = () => {
                   </svg>
                 </Link>
                 
-                <Link to="/requests" className={`p-3 rounded-full transition-all ${isActive('/requests') ? 'bg-pink-100 text-pink-600' : 'text-gray-600 hover:bg-gray-100'}`}>
+                <Link to="/requests" className={`p-3 rounded-full transition-all relative ${isActive('/requests') ? 'bg-pink-100 text-pink-600' : 'text-gray-600 hover:bg-gray-100'}`}>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                   </svg>
-                </Link>
-
-                <Link to="/chat" className={`p-3 rounded-full transition-all ${isActive('/chat') ? 'bg-pink-100 text-pink-600' : 'text-gray-600 hover:bg-gray-100'}`}>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
+                  <NotificationBadge count={requestsCount} />
                 </Link>
               </div>
 
