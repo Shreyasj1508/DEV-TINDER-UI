@@ -4,6 +4,7 @@ import { removeUser } from "../utils/userSlice";
 import { apiService } from "../utils/apiService";
 import { useRequestsCount } from "../utils/useRequestsCount";
 import NotificationBadge from "./NotificationBadge";
+import ChatDropdown from "./ChatDropdown";
 
 const NavBar = () => {
   const user = useSelector((store) => store.user);
@@ -97,6 +98,11 @@ const NavBar = () => {
                 <NotificationBadge count={requestsCount} />
               </Link>
 
+              {/* Chat Dropdown - Desktop */}
+              <div className="hidden lg:block">
+                <ChatDropdown />
+              </div>
+
               {/* Mobile Navigation Icons */}
               <div className="flex lg:hidden items-center space-x-1">
                 <Link to="/" className={`p-3 rounded-full transition-all ${isActive('/') ? 'bg-pink-100 text-pink-600' : 'text-gray-600 hover:bg-gray-100'}`}>
@@ -117,6 +123,11 @@ const NavBar = () => {
                   </svg>
                   <NotificationBadge count={requestsCount} />
                 </Link>
+                
+                {/* Chat Dropdown - Mobile */}
+                <div className="lg:hidden">
+                  <ChatDropdown />
+                </div>
               </div>
 
               {/* Profile Dropdown */}

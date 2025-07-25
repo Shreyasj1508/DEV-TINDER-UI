@@ -178,6 +178,19 @@ export const apiService = {
     }
   },
 
+  async getRecentChats() {
+    if (USE_MOCK_BACKEND) {
+      return await mockBackendAPI.getRecentChats();
+    }
+    
+    try {
+      const response = await apiClient.get('/chat/recent');
+      return { success: true, data: response.data.data };
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch recent chats');
+    }
+  },
+
   // Premium
   async verifyPremium() {
     if (USE_MOCK_BACKEND) {
