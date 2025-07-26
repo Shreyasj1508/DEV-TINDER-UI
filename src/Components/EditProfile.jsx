@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import UserCard from "./userCard";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
@@ -6,27 +6,73 @@ import { apiService } from "../utils/apiService";
 import Toast from "./Toast";
 
 const EditProfile = ({ user }) => {
-  const [firstName, setFirstname] = useState(user.firstName || "");
-  const [lastName, setLastName] = useState(user.lastName || "");
-  const [photoURL, setPhotoURL] = useState(user.photoURL || user.photo || "");
-  const [age, setAge] = useState(user.age || "");
-  const [gender, setGender] = useState(user.gender || "");
-  const [about, setAbout] = useState(user.about || "");
-  const [skills, setSkills] = useState(user.skills || []);
-  const [location, setLocation] = useState(user.location || "");
-  const [occupation, setOccupation] = useState(user.occupation || "");
-  const [company, setCompany] = useState(user.company || "");
-  const [education, setEducation] = useState(user.education || "");
-  const [interests, setInterests] = useState(user.interests || []);
-  const [github, setGithub] = useState(user.github || "");
-  const [linkedin, setLinkedin] = useState(user.linkedin || "");
-  const [portfolio, setPortfolio] = useState(user.portfolio || "");
+  // Initialize state with user data or empty values
+  const [firstName, setFirstname] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [photoURL, setPhotoURL] = useState("");
+  const [age, setAge] = useState("");
+  const [gender, setGender] = useState("");
+  const [about, setAbout] = useState("");
+  const [skills, setSkills] = useState([]);
+  const [location, setLocation] = useState("");
+  const [occupation, setOccupation] = useState("");
+  const [company, setCompany] = useState("");
+  const [education, setEducation] = useState("");
+  const [interests, setInterests] = useState([]);
+  const [github, setGithub] = useState("");
+  const [linkedin, setLinkedin] = useState("");
+  const [portfolio, setPortfolio] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState("success");
   const dispatch = useDispatch();
+
+  // Update form fields whenever user prop changes (after fresh data fetch)
+  useEffect(() => {
+    console.log('EditProfile useEffect triggered with user:', user);
+    
+    if (user) {
+      console.log('User data found, updating form fields...');
+      console.log('User object:', JSON.stringify(user, null, 2));
+      
+      // Handle both direct user object and API response wrapped user object
+      const userData = user.data ? user.data : user;
+      console.log('Extracted userData:', JSON.stringify(userData, null, 2));
+      
+      setFirstname(userData.firstName || "");
+      setLastName(userData.lastName || "");
+      setPhotoURL(userData.photoURL || userData.photo || userData.picture || userData.avatar || "");
+      setAge(userData.age ? String(userData.age) : "");
+      setGender(userData.gender || "");
+      setAbout(userData.about || "");
+      setSkills(Array.isArray(userData.skills) ? userData.skills : []);
+      setLocation(userData.location || "");
+      setOccupation(userData.occupation || "");
+      setCompany(userData.company || "");
+      setEducation(userData.education || "");
+      setInterests(Array.isArray(userData.interests) ? userData.interests : []);
+      setGithub(userData.github || "");
+      setLinkedin(userData.linkedin || "");
+      setPortfolio(userData.portfolio || "");
+      
+      console.log('Form fields updated with values:', {
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        age: userData.age,
+        location: userData.location,
+        about: userData.about,
+        photoURL: userData.photoURL || userData.photo,
+        gender: userData.gender,
+        company: userData.company,
+        education: userData.education,
+        occupation: userData.occupation
+      });
+    } else {
+      console.log('No user data available yet');
+    }
+  }, [user]); // Re-run whenever user prop changes
 
   const saveProfile = async () => {
     setError("");
@@ -37,6 +83,7 @@ const EditProfile = ({ user }) => {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         photoURL: photoURL.trim(),
+        photo: photoURL.trim(), // Backend might expect 'photo' field
         age: age ? parseInt(age) : undefined,
         gender,
         about: about.trim(),
@@ -58,14 +105,39 @@ const EditProfile = ({ user }) => {
         }
       });
 
+      console.log('Updating profile with data:', profileData);
+      console.log('All form field values:', {
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        photoURL: photoURL.trim(),
+        age: age,
+        gender: gender,
+        about: about.trim(),
+        skills: skills,
+        location: location.trim(),
+        occupation: occupation.trim(),
+        company: company.trim(),
+        education: education.trim(),
+        interests: interests,
+        github: github.trim(),
+        linkedin: linkedin.trim(),
+        portfolio: portfolio.trim()
+      });
       const response = await apiService.updateProfile(profileData);
+      console.log('Profile update response:', response);
       
       if (response.success) {
+        // Update Redux store with the latest user data
         dispatch(addUser(response.data));
+        console.log('Updated user data in Redux:', response.data);
+        
+        // Show success message
         setToastMessage("Profile updated successfully! 🎉");
         setToastType("success");
         setShowToast(true);
         setTimeout(() => setShowToast(false), 3000);
+        
+        // Note: Form fields will be automatically updated by useEffect when Redux state changes
       }
     } catch (error) {
       console.error("Profile update error:", error);
@@ -87,6 +159,17 @@ const EditProfile = ({ user }) => {
 
   return (
     <>
+      {/* Show loading state if user data is not ready */}
+      {!user && (
+        <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-50 to-indigo-100 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading your profile data...</p>
+          </div>
+        </div>
+      )}
+      
+      {user && (
       <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-50 to-indigo-100 py-8 relative overflow-hidden">
         {/* Background Animation */}
         <div className="absolute inset-0 opacity-30">
@@ -378,7 +461,8 @@ const EditProfile = ({ user }) => {
                     firstName, 
                     lastName, 
                     photoURL, 
-                    photo: photoURL,
+                    photoUrl: photoURL, // For compatibility
+                    photo: photoURL, // For compatibility
                     about, 
                     age, 
                     gender, 
@@ -401,6 +485,7 @@ const EditProfile = ({ user }) => {
           </div>
         </div>
       </div>
+      )}
 
       {showToast && (
         <Toast
