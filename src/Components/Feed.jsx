@@ -310,23 +310,23 @@ const Feed = () => {
         )}
 
         {/* Header with Enhanced Stats */}
-        <div className="mb-6 md:mb-8 text-center">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent mb-2">
+        <div className="mb-4 md:mb-6 text-center">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent mb-2">
             Discover Developers
           </h1>
-          <p className="text-gray-600 text-base md:text-lg">Find your perfect coding partner</p>
-          <div className="mt-3 md:mt-4 flex items-center justify-center gap-2 flex-wrap">
-            <div className="px-3 md:px-4 py-1.5 md:py-2 bg-white/70 backdrop-blur-sm rounded-full text-xs md:text-sm font-medium text-gray-700 shadow-sm">
+          <p className="text-gray-600 text-sm md:text-base">Find your perfect coding partner</p>
+          <div className="mt-2 md:mt-3 flex items-center justify-center gap-2 flex-wrap">
+            <div className="px-3 py-1 bg-white/70 backdrop-blur-sm rounded-full text-xs font-medium text-gray-700 shadow-sm">
               📍 {filteredFeed.length} developer{filteredFeed.length !== 1 ? 's' : ''} available
             </div>
             {userData?.firstName && (
-              <div className="px-3 md:px-4 py-1.5 md:py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full text-xs md:text-sm font-medium shadow-sm">
+              <div className="px-3 py-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full text-xs font-medium shadow-sm">
                 👋 Hi {userData.firstName}!
               </div>
             )}
             <button
               onClick={() => setShowStats(!showStats)}
-              className="px-3 md:px-4 py-1.5 md:py-2 bg-blue-500/70 backdrop-blur-sm rounded-full text-xs md:text-sm font-medium text-white shadow-sm hover:bg-blue-600/70 transition-all"
+              className="px-3 py-1 bg-blue-500/70 backdrop-blur-sm rounded-full text-xs font-medium text-white shadow-sm hover:bg-blue-600/70 transition-all"
             >
               📊 Stats
             </button>
@@ -334,16 +334,16 @@ const Feed = () => {
           
           {/* Stats Panel */}
           {showStats && (
-            <div className="mt-4 p-4 bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/40 max-w-sm mx-auto animate-fade-in">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Session Stats</h3>
+            <div className="mt-3 p-3 bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/40 max-w-xs mx-auto animate-fade-in">
+              <h3 className="text-base font-semibold text-gray-800 mb-2">Session Stats</h3>
               <div className="flex gap-6 justify-center">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-pink-500">{swipeStats.likes}</div>
-                  <div className="text-sm text-gray-600">💖 Likes</div>
+                  <div className="text-xl font-bold text-pink-500">{swipeStats.likes}</div>
+                  <div className="text-xs text-gray-600">💖 Likes</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-500">{swipeStats.passes}</div>
-                  <div className="text-sm text-gray-600">👋 Passes</div>
+                  <div className="text-xl font-bold text-gray-500">{swipeStats.passes}</div>
+                  <div className="text-xs text-gray-600">👋 Passes</div>
                 </div>
               </div>
             </div>
@@ -351,19 +351,19 @@ const Feed = () => {
         </div>
 
         {/* Card Stack Container */}
-        <div className="relative w-full max-w-sm md:max-w-md lg:max-w-lg px-2">
+        <div className="relative w-full max-w-xs md:max-w-sm lg:max-w-md px-2">
           {/* Background Cards for Stack Effect */}
           {filteredFeed.slice(1, 3).map((user, index) => (
             <div
               key={user._id}
               className="absolute top-1 left-1 right-1 md:top-2 md:left-2 md:right-2"
               style={{
-                transform: `scale(${0.95 - index * 0.03}) translateY(${(index + 1) * 6}px)`,
+                transform: `scale(${0.95 - index * 0.03}) translateY(${(index + 1) * 4}px)`,
                 zIndex: -index - 1,
                 opacity: 0.6 - index * 0.2
               }}
             >
-              <div className="w-full h-[600px] lg:h-[650px] bg-white/60 backdrop-blur-sm rounded-3xl shadow-lg border border-white/40"></div>
+              <div className="w-full h-[480px] md:h-[520px] lg:h-[550px] bg-white/60 backdrop-blur-sm rounded-3xl shadow-lg border border-white/40"></div>
             </div>
           ))}
 

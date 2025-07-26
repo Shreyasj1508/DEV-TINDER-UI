@@ -63,9 +63,9 @@ const UserCard = ({ user }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-sm mx-auto border border-gray-100">
+    <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-xs md:max-w-sm mx-auto border border-gray-100">
       {/* Profile Image */}
-      <div className="relative h-80 bg-gradient-to-br from-pink-100 to-purple-100">
+      <div className="relative h-56 md:h-64 bg-gradient-to-br from-pink-100 to-purple-100">
         {profilePhoto ? (
           <img
             src={profilePhoto}
@@ -100,19 +100,19 @@ const UserCard = ({ user }) => {
       </div>
 
       {/* Content */}
-      <div className="p-6">
+      <div className="p-4">
         {/* Name and Title */}
-        <div className="mb-4">
-          <h2 className="text-2xl font-bold text-gray-900 mb-1">
+        <div className="mb-3">
+          <h2 className="text-xl font-bold text-gray-900 mb-1">
             {firstName} {lastName}
             {gender && (
-              <span className="ml-2 text-lg">
+              <span className="ml-2 text-base">
                 {gender === 'male' || gender === 'Male' ? '♂️' : gender === 'female' || gender === 'Female' ? '♀️' : '🧑‍💼'}
               </span>
             )}
           </h2>
           {(occupation || company) && (
-            <p className="text-gray-600 font-medium">
+            <p className="text-gray-600 font-medium text-sm">
               {occupation}
               {occupation && company && ' at '}
               {company}
@@ -125,11 +125,11 @@ const UserCard = ({ user }) => {
 
         {/* About */}
         {about && (
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2 flex items-center">
+          <div className="mb-3">
+            <h3 className="text-base font-semibold text-gray-800 mb-1 flex items-center">
               📝 About
             </h3>
-            <p className="text-gray-600 text-sm leading-relaxed">
+            <p className="text-gray-600 text-xs leading-relaxed line-clamp-3">
               {about}
             </p>
           </div>
@@ -137,15 +137,15 @@ const UserCard = ({ user }) => {
 
         {/* Skills */}
         {skills && skills.length > 0 && (
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+          <div className="mb-3">
+            <h3 className="text-base font-semibold text-gray-800 mb-2 flex items-center">
               💻 Skills
             </h3>
-            <div className="flex flex-wrap gap-2">
-              {skills.slice(0, 6).map((skill, index) => (
+            <div className="flex flex-wrap gap-1">
+              {skills.slice(0, 4).map((skill, index) => (
                 <span
                   key={index}
-                  className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium"
+                  className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium"
                 >
                   {skill}
                 </span>
@@ -238,7 +238,7 @@ const UserCard = ({ user }) => {
           <div className="flex gap-3">
             {/* Pass Button */}
             <button
-              className={`flex-1 bg-gray-100 hover:bg-red-100 text-gray-700 hover:text-red-600 font-semibold py-3 px-6 rounded-xl border border-gray-200 hover:border-red-300 transition-all duration-200 ${
+              className={`flex-1 bg-gray-100 hover:bg-red-100 text-gray-700 hover:text-red-600 font-semibold py-2 px-4 rounded-xl border border-gray-200 hover:border-red-300 transition-all duration-200 ${
                 isAnimating ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'
               }`}
               onClick={() => handleSendRequest("ignored", _id)}
@@ -249,7 +249,7 @@ const UserCard = ({ user }) => {
 
             {/* Like Button */}
             <button
-              className={`flex-1 bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-pink-300/50 transition-all duration-200 ${
+              className={`flex-1 bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white font-semibold py-2 px-4 rounded-xl shadow-lg hover:shadow-pink-300/50 transition-all duration-200 ${
                 isAnimating ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'
               }`}
               onClick={() => handleSendRequest("interested", _id)}

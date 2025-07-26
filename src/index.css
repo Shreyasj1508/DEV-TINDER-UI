@@ -429,3 +429,12 @@ input[type="checkbox"]:checked {
   background-color: #ec4899;
   border-color: #ec4899;
 }
+
+/* Line clamp utilities */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
