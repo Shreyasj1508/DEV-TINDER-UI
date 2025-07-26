@@ -1,7 +1,6 @@
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import NavBar from "./Navbar";
 import Footer from "./Footer";
-import DevConfig from "./DevConfig";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { useEffect, useState } from "react";
@@ -69,7 +68,6 @@ const Body = () => {
         <Outlet />
       </div>
       <Footer />
-      <DevConfig />
     </div>
   );
 };

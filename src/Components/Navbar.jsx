@@ -4,7 +4,6 @@ import { removeUser } from "../utils/userSlice";
 import { apiService } from "../utils/apiService";
 import { useRequestsCount } from "../utils/useRequestsCount";
 import NotificationBadge from "./NotificationBadge";
-import ChatDropdown from "./ChatDropdown";
 
 const NavBar = () => {
   const user = useSelector((store) => store.user);
@@ -12,17 +11,6 @@ const NavBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { requestsCount } = useRequestsCount();
-
-  // Debug: Log user object to see photo property names
-  console.log('User object in Navbar:', user);
-  console.log('Available photo properties:', {
-    photoURL: user?.photoURL,
-    photo: user?.photo,
-    photoUrl: user?.photoUrl,
-    picture: user?.picture,
-    avatar: user?.avatar,
-    image: user?.image
-  });
 
   const handleLogout = async () => {
     try {
@@ -55,7 +43,6 @@ const NavBar = () => {
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                 </svg>
               </div>
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
             </div>
             <div>
               <span className="text-2xl font-bold bg-gradient-to-r from-pink-600 via-red-500 to-orange-500 bg-clip-text text-transparent">
@@ -143,11 +130,6 @@ const NavBar = () => {
                 <NotificationBadge count={requestsCount} />
               </Link>
 
-              {/* Chat Dropdown - Desktop */}
-              <div className="hidden lg:block">
-                <ChatDropdown />
-              </div>
-
               {/* Mobile Navigation Icons */}
               <div className="flex lg:hidden items-center space-x-1">
                 <Link
@@ -219,11 +201,6 @@ const NavBar = () => {
                   </svg>
                   <NotificationBadge count={requestsCount} />
                 </Link>
-
-                {/* Chat Dropdown - Mobile */}
-                <div className="lg:hidden">
-                  <ChatDropdown />
-                </div>
               </div>
 
               {/* Profile Dropdown */}
@@ -240,7 +217,6 @@ const NavBar = () => {
                         className="w-full h-full object-cover"
                         src={user?.photoURL || user?.photo || user?.photoUrl || user?.picture || user?.avatar}
                         onError={(e) => {
-                          console.log('Image failed to load:', e.target.src);
                           // Try fallback avatar URL
                           const fallbackUrl = `https://ui-avatars.com/api/?name=${user?.firstName}+${user?.lastName}&background=ec4899&color=fff&size=200`;
                           if (e.target.src !== fallbackUrl) {
@@ -282,7 +258,6 @@ const NavBar = () => {
                             alt="Profile"
                             className="w-full h-full object-cover"
                             onError={(e) => {
-                              console.log('Dropdown image failed to load:', e.target.src);
                               // Try fallback avatar URL
                               const fallbackUrl = `https://ui-avatars.com/api/?name=${user?.firstName}+${user?.lastName}&background=ec4899&color=fff&size=200`;
                               if (e.target.src !== fallbackUrl) {

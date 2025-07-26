@@ -23,7 +23,10 @@ const Feed = () => {
 
   // Filter feed to exclude users already in connections or requests
   const getFilteredFeed = () => {
-    if (!feed || !Array.isArray(feed)) return [];
+    if (!feed || !Array.isArray(feed)) {
+      console.log('Feed is empty or not array:', feed);
+      return [];
+    }
     
     // Get IDs of users already connected or requested
     const connectedUserIds = new Set();
@@ -34,6 +37,9 @@ const Feed = () => {
       connections.forEach(connection => {
         if (connection._id) connectedUserIds.add(connection._id);
       });
+      console.log('Connections:', connections.length, 'IDs:', Array.from(connectedUserIds));
+    } else {
+      console.log('No connections or not array:', connections);
     }
     
     // Add request IDs (both sent and received)
@@ -44,30 +50,51 @@ const Feed = () => {
         if (request.fromUserId) requestedUserIds.add(request.fromUserId);
         if (request.toUserId) requestedUserIds.add(request.toUserId);
       });
+      console.log('Requests:', requests.length, 'IDs:', Array.from(requestedUserIds));
+    } else {
+      console.log('No requests or not array:', requests);
     }
     
     // Filter out current user, connections, and requests
     const filtered = feed.filter(feedUser => {
-      if (!feedUser._id) return false;
-      if (feedUser._id === user?._id) return false; // Don't show current user
-      if (connectedUserIds.has(feedUser._id)) return false; // Don't show connected users
-      if (requestedUserIds.has(feedUser._id)) return false; // Don't show requested users
+      if (!feedUser._id) {
+        console.log('User has no _id:', feedUser);
+        return false;
+      }
+      if (feedUser._id === user?._id) {
+        console.log('Filtering out current user:', feedUser._id);
+        return false; // Don't show current user
+      }
+      if (connectedUserIds.has(feedUser._id)) {
+        console.log('Filtering out connected user:', feedUser._id);
+        return false; // Don't show connected users
+      }
+      if (requestedUserIds.has(feedUser._id)) {
+        console.log('Filtering out requested user:', feedUser._id);
+        return false; // Don't show requested users
+      }
       return true;
     });
     
-    console.log('Feed filtering:', {
+    console.log('Filtering result:', {
       totalFeed: feed.length,
-      connections: connectedUserIds.size,
-      requests: requestedUserIds.size,
       filteredFeed: filtered.length,
-      connectedIds: Array.from(connectedUserIds),
-      requestedIds: Array.from(requestedUserIds)
+      connectedCount: connectedUserIds.size,
+      requestsCount: requestedUserIds.size
     });
     
     return filtered;
   };
 
   const filteredFeed = getFilteredFeed();
+
+  // Debug current Redux state
+  console.log('Current Redux state:', {
+    feed: feed?.length || 0,
+    connections: connections?.length || 0,
+    requests: requests?.length || 0,
+    user: user?._id
+  });
 
   const getFeed = async (forceRefresh = false) => {
     // Check filtered feed length instead of raw feed
@@ -82,31 +109,27 @@ const Feed = () => {
     try {
       setLoading(true);
       setError(null);
-      console.log("Fetching feed...", forceRefresh ? "(forced)" : "", `Current filtered: ${currentFilteredFeed.length}`);
       const response = await apiService.getFeed();
       
       if (response.success) {
-        console.log("Feed response:", response.data);
+        console.log('Feed API response:', response.data);
+        console.log('Feed data type:', typeof response.data, 'Is array:', Array.isArray(response.data));
         dispatch(addFeed(response.data));
         
         // After adding new feed, check if we still need more users
         setTimeout(() => {
           const newFilteredFeed = getFilteredFeed();
-          console.log(`After fetch - Filtered feed: ${newFilteredFeed.length}`);
           
           // If still low after fetch, try again (but prevent infinite loop)
           if (newFilteredFeed.length <= 1 && !forceRefresh) {
-            console.log("Still low users after fetch, trying again...");
             getFeed(true);
           }
         }, 500);
       }
     } catch (err) {
-      console.log("Error fetching feed:", err);
       setError(err.message);
       // Fallback to mock data if API fails
       if (err.response?.status === 401) {
-        console.log("Using fallback mock data");
         // You can add mock data here if needed for development
       }
     } finally {
@@ -158,7 +181,6 @@ const Feed = () => {
   };
 
   useEffect(() => {
-    console.log("Feed component mounted, current feed:", feed);
     getFeed();
     
     // Also fetch connections and requests to ensure filtering works
@@ -167,16 +189,18 @@ const Feed = () => {
         // Fetch connections
         const connectionsResponse = await apiService.getConnections();
         if (connectionsResponse.success) {
+          console.log('Connections API response:', connectionsResponse.data);
           dispatch(addConnections(connectionsResponse.data || []));
         }
         
         // Fetch requests
         const requestsResponse = await apiService.getReceivedRequests();
         if (requestsResponse.success) {
+          console.log('Requests API response:', requestsResponse.data);
           dispatch(addRequests(requestsResponse.data || []));
         }
       } catch (err) {
-        console.log("Error fetching user data for filtering:", err);
+        // Silently handle errors for filtering data
       }
     };
     
@@ -187,20 +211,12 @@ const Feed = () => {
   useEffect(() => {
     const currentFilteredFeed = getFilteredFeed();
     if (currentFilteredFeed.length <= 1) {
-      console.log(`Filtered feed is getting low (${currentFilteredFeed.length}), refreshing...`);
       const timer = setTimeout(() => {
         getFeed(true); // Force refresh
       }, 1000);
       return () => clearTimeout(timer);
     }
   }, [feed, connections, requests]); // Re-run when any of these change
-
-  console.log("Feed state:", {
-    rawFeed: feed?.length || 0,
-    filteredFeed: filteredFeed.length,
-    connections: connections?.length || 0,
-    requests: requests?.length || 0
-  });
 
   if (loading) {
     return (
@@ -258,9 +274,6 @@ const Feed = () => {
             >
               🔄 Refresh Feed
             </button>
-            <p className="text-sm text-gray-500">
-              Raw feed: {feed.length} | Available: {filteredFeed.length}
-            </p>
           </div>
         </div>
       </div>
@@ -301,9 +314,6 @@ const Feed = () => {
           <div className="mt-3 md:mt-4 flex items-center justify-center gap-2 flex-wrap">
             <div className="px-3 md:px-4 py-1.5 md:py-2 bg-white/70 backdrop-blur-sm rounded-full text-xs md:text-sm font-medium text-gray-700 shadow-sm">
               📍 {filteredFeed.length} developer{filteredFeed.length !== 1 ? 's' : ''} available
-            </div>
-            <div className="px-3 md:px-4 py-1.5 md:py-2 bg-gray-500/70 backdrop-blur-sm rounded-full text-xs md:text-sm font-medium text-white shadow-sm">
-              🔄 {feed?.length || 0} total fetched
             </div>
             {user?.firstName && (
               <div className="px-3 md:px-4 py-1.5 md:py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full text-xs md:text-sm font-medium shadow-sm">
@@ -357,11 +367,6 @@ const Feed = () => {
           <div className="relative z-10">
             <UserCard user={currentUser} />
           </div>
-        </div>
-
-        {/* Feed Status Debug Info - Remove in production */}
-        <div className="fixed top-20 left-4 bg-black/70 text-white p-2 rounded text-xs z-50">
-          Feed: {filteredFeed.length}/{feed?.length || 0} users
         </div>
 
         {/* Floating Refresh Button */}
