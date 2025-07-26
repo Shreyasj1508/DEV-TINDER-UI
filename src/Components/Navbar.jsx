@@ -4,6 +4,7 @@ import { removeUser } from "../utils/userSlice";
 import { apiService } from "../utils/apiService";
 import { useRequestsCount } from "../utils/useRequestsCount";
 import NotificationBadge from "./NotificationBadge";
+import ChatDropdown from "./ChatDropdown";
 
 const NavBar = () => {
   const user = useSelector((store) => store.user);
@@ -11,6 +12,9 @@ const NavBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { requestsCount } = useRequestsCount();
+
+  // Handle both direct user object and API response wrapped user object
+  const userData = user?.data ? user.data : user;
 
   const handleLogout = async () => {
     try {
@@ -104,6 +108,9 @@ const NavBar = () => {
                 </svg>
                 <span className="font-medium">Matches</span>
               </Link>
+
+              {/* Chat Dropdown - Responsive */}
+              <ChatDropdown />
 
               <Link
                 to="/requests"
@@ -211,14 +218,14 @@ const NavBar = () => {
                   className="btn btn-ghost btn-circle avatar hover:shadow-lg transition-all duration-200 border-2 border-transparent hover:border-pink-200"
                 >
                   <div className="w-10 rounded-full overflow-hidden ring-2 ring-pink-200 ring-offset-2">
-                    {(user?.photoURL || user?.photo || user?.photoUrl || user?.picture || user?.avatar) ? (
+                    {(userData?.photoURL || userData?.photo || userData?.photoUrl || userData?.picture || userData?.avatar) ? (
                       <img
                         alt="Profile"
                         className="w-full h-full object-cover"
-                        src={user?.photoURL || user?.photo || user?.photoUrl || user?.picture || user?.avatar}
+                        src={userData?.photoURL || userData?.photo || userData?.photoUrl || userData?.picture || userData?.avatar}
                         onError={(e) => {
                           // Try fallback avatar URL
-                          const fallbackUrl = `https://ui-avatars.com/api/?name=${user?.firstName}+${user?.lastName}&background=ec4899&color=fff&size=200`;
+                          const fallbackUrl = `https://ui-avatars.com/api/?name=${userData?.firstName}+${userData?.lastName}&background=ec4899&color=fff&size=200`;
                           if (e.target.src !== fallbackUrl) {
                             e.target.src = fallbackUrl;
                           } else {
@@ -232,7 +239,7 @@ const NavBar = () => {
                     <div
                       className="w-full h-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center"
                       style={{
-                        display: (user?.photoURL || user?.photo || user?.photoUrl || user?.picture || user?.avatar) ? "none" : "flex",
+                        display: (userData?.photoURL || userData?.photo || userData?.photoUrl || userData?.picture || userData?.avatar) ? "none" : "flex",
                       }}
                     >
                       <svg
@@ -252,14 +259,14 @@ const NavBar = () => {
                   <li className="menu-title px-4 py-2">
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 rounded-full overflow-hidden ring-2 ring-pink-200">
-                        {(user?.photoURL || user?.photo || user?.photoUrl || user?.picture || user?.avatar) ? (
+                        {(userData?.photoURL || userData?.photo || userData?.photoUrl || userData?.picture || userData?.avatar) ? (
                           <img
-                            src={user?.photoURL || user?.photo || user?.photoUrl || user?.picture || user?.avatar}
+                            src={userData?.photoURL || userData?.photo || userData?.photoUrl || userData?.picture || userData?.avatar}
                             alt="Profile"
                             className="w-full h-full object-cover"
                             onError={(e) => {
                               // Try fallback avatar URL
-                              const fallbackUrl = `https://ui-avatars.com/api/?name=${user?.firstName}+${user?.lastName}&background=ec4899&color=fff&size=200`;
+                              const fallbackUrl = `https://ui-avatars.com/api/?name=${userData?.firstName}+${userData?.lastName}&background=ec4899&color=fff&size=200`;
                               if (e.target.src !== fallbackUrl) {
                                 e.target.src = fallbackUrl;
                               } else {
@@ -273,7 +280,7 @@ const NavBar = () => {
                         <div
                           className="w-full h-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center"
                           style={{
-                            display: (user?.photoURL || user?.photo || user?.photoUrl || user?.picture || user?.avatar) ? "none" : "flex",
+                            display: (userData?.photoURL || userData?.photo || userData?.photoUrl || userData?.picture || userData?.avatar) ? "none" : "flex",
                           }}
                         >
                           <svg
@@ -287,10 +294,10 @@ const NavBar = () => {
                       </div>
                       <div>
                         <div className="font-semibold text-gray-800">
-                          {user?.firstName} {user?.lastName}
+                          {userData?.firstName} {userData?.lastName}
                         </div>
                         <div className="text-xs text-gray-500 -mt-1">
-                          {user?.emailId || user?.email}
+                          {userData?.emailId || userData?.email}
                         </div>
                       </div>
                     </div>

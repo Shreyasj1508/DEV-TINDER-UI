@@ -13,6 +13,10 @@ const Feed = () => {
   const user = useSelector((store) => store.user);
   const connections = useSelector((store) => store.connections);
   const requests = useSelector((store) => store.requests);
+  
+  // Handle both direct user object and API response wrapped user object
+  const userData = user?.data ? user.data : user;
+  
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [swipeStats, setSwipeStats] = useState({ likes: 0, passes: 0 });
@@ -61,7 +65,7 @@ const Feed = () => {
         console.log('User has no _id:', feedUser);
         return false;
       }
-      if (feedUser._id === user?._id) {
+      if (feedUser._id === userData?._id) {
         console.log('Filtering out current user:', feedUser._id);
         return false; // Don't show current user
       }
@@ -315,9 +319,9 @@ const Feed = () => {
             <div className="px-3 md:px-4 py-1.5 md:py-2 bg-white/70 backdrop-blur-sm rounded-full text-xs md:text-sm font-medium text-gray-700 shadow-sm">
               📍 {filteredFeed.length} developer{filteredFeed.length !== 1 ? 's' : ''} available
             </div>
-            {user?.firstName && (
+            {userData?.firstName && (
               <div className="px-3 md:px-4 py-1.5 md:py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full text-xs md:text-sm font-medium shadow-sm">
-                👋 Hi {user.firstName}!
+                👋 Hi {userData.firstName}!
               </div>
             )}
             <button

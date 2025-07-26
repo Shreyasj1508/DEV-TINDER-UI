@@ -287,6 +287,26 @@ export const mockBackendAPI = {
     return { success: true, data: newMessage };
   },
 
+  // Recent Chats
+  getRecentChats: async () => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Mock recent chats data
+    const recentChats = mockDatabase.connections.slice(0, 5).map(user => ({
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      photo: user.photoUrl || user.photoURL,
+      photoURL: user.photoUrl || user.photoURL,
+      lastMessage: "Hey! How's your coding going?",
+      lastMessageTime: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000).toISOString(),
+      hasUnread: Math.random() > 0.7, // 30% chance of having unread messages
+      unreadCount: Math.random() > 0.7 ? Math.floor(Math.random() * 5) + 1 : 0
+    }));
+
+    return { success: true, data: recentChats };
+  },
+
   // Premium Functions
   verifyPremium: async () => {
     await new Promise(resolve => setTimeout(resolve, 300));

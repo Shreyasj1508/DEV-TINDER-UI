@@ -9,8 +9,12 @@ const Chat = () => {
   const { targetUserId } = useParams();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const [socket, setSocket] = useState(null);
   const user = useSelector((store) => store.user);
-  const userId = user?._id;
+  
+  // Handle both direct user object and API response wrapped user object
+  const userData = user?.data ? user.data : user;
+  const userId = userData?._id;
 
   const fetchChatMessages = async () => {
     const chat = await axios.get(BASE_URL + "/chat/" + targetUserId, {
@@ -31,39 +35,54 @@ const Chat = () => {
   };
   useEffect(() => {
     fetchChatMessages();
-  }, []);
+  }, [targetUserId]);
 
   useEffect(() => {
     if (!userId) {
       return;
     }
-    const socket = createSocketConnection();
+    
+    const socketConnection = createSocketConnection();
+    setSocket(socketConnection);
+    
     // As soon as the page loaded, the socket connection is made and joinChat event is emitted
-    socket.emit("joinChat", {
-      firstName: user.firstName,
+    socketConnection.emit("joinChat", {
+      firstName: userData.firstName,
       userId,
       targetUserId,
     });
 
-    socket.on("messageReceived", ({ firstName, lastName, text }) => {
-      console.log(firstName + " :  " + text);
-      setMessages((messages) => [...messages, { firstName, lastName, text }]);
+    socketConnection.on("messageReceived", ({ firstName, lastName, text }) => {
+      console.log("Message received:", firstName + " : " + text);
+      setMessages((prevMessages) => [...prevMessages, { firstName, lastName, text }]);
     });
 
     return () => {
-      socket.disconnect();
+      socketConnection.disconnect();
+      setSocket(null);
     };
-  }, [userId, targetUserId]);
+  }, [userId, targetUserId, userData?.firstName]);
 
   const sendMessage = () => {
-    const socket = createSocketConnection();
+    if (!socket || !newMessage.trim()) return;
+    
+    console.log("Sending message:", newMessage);
+    
     socket.emit("sendMessage", {
-      firstName: user.firstName,
-      lastName: user.lastName,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
       userId,
       targetUserId,
       text: newMessage,
     });
+    
+    // Add message to UI immediately for better UX
+    setMessages((prevMessages) => [...prevMessages, { 
+      firstName: userData.firstName, 
+      lastName: userData.lastName, 
+      text: newMessage 
+    }]);
+    
     setNewMessage("");
   };
 
@@ -93,23 +112,23 @@ const Chat = () => {
             ) : (
               <div className="space-y-4">
                 {messages.map((msg, index) => {
-                  const isCurrentUser = user.firstName === msg.firstName;
+                  const isCurrentUser = userData?.firstName === msg.firstName;
                   return (
                     <div
                       key={index}
-                      className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
+                      className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-4`}
                     >
                       <div className={`max-w-[70%] ${isCurrentUser ? 'order-2' : 'order-1'}`}>
-                        <div className={`rounded-2xl px-4 py-3 ${
+                        <div className={`rounded-2xl px-4 py-3 shadow-sm ${
                           isCurrentUser 
                             ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white' 
                             : 'bg-white border border-gray-200 text-gray-800'
                         }`}>
-                          <p className="text-sm mb-1">{msg.text}</p>
+                          <p className="text-sm leading-relaxed">{msg.text}</p>
                         </div>
-                        <div className={`text-xs text-gray-500 mt-1 ${isCurrentUser ? 'text-right' : 'text-left'}`}>
-                          {!isCurrentUser && `${msg.firstName} ${msg.lastName} • `}
-                          2 hours ago
+                        <div className={`text-xs text-gray-500 mt-1 px-2 ${isCurrentUser ? 'text-right' : 'text-left'}`}>
+                          {!isCurrentUser && `${msg.firstName} ${msg.lastName || ''} • `}
+                          Just now
                         </div>
                       </div>
                     </div>
