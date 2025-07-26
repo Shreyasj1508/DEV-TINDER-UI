@@ -1,7 +1,7 @@
 import { useDispatch } from "react-redux";
 import { removeUserFromFeed } from "../utils/feedSlice";
 import { apiService } from "../utils/apiService";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const UserCard = ({ user }) => {
   const dispatch = useDispatch();
@@ -31,6 +31,12 @@ const UserCard = ({ user }) => {
   // Use the first available photo URL
   const profilePhoto = photoUrl || photoURL || photo;
 
+  // Reset animation state when user changes
+  useEffect(() => {
+    setIsAnimating(false);
+    setError(null);
+  }, [_id]);
+
   const handleSendRequest = async (status, userId) => {
     if (isAnimating) return;
     
@@ -38,10 +44,16 @@ const UserCard = ({ user }) => {
     setError(null);
     
     try {
+      console.log(`Sending ${status} request for user ${userId}`);
       const response = await apiService.sendConnectionRequest(status, userId);
       
       if (response.success) {
+        console.log(`${status} request successful, removing user from feed`);
         dispatch(removeUserFromFeed(userId));
+      } else {
+        console.log(`${status} request failed:`, response);
+        setError(`Failed to send ${status} request`);
+        setIsAnimating(false);
       }
     } catch (err) {
       console.error("Error sending request:", err);

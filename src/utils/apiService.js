@@ -10,8 +10,49 @@ let USE_MOCK_BACKEND = false; // Temporarily using mock backend since real backe
 const apiClient = axios.create({
   baseURL: BASE_URL,
   withCredentials: true,
-  timeout: 10000
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  }
 });
+
+// Add request interceptor for debugging
+apiClient.interceptors.request.use(
+  (config) => {
+    console.log('API Request:', {
+      method: config.method,
+      url: config.url,
+      baseURL: config.baseURL,
+      headers: config.headers,
+      withCredentials: config.withCredentials
+    });
+    return config;
+  },
+  (error) => {
+    console.error('Request error:', error);
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor for debugging
+apiClient.interceptors.response.use(
+  (response) => {
+    console.log('API Response:', {
+      status: response.status,
+      url: response.config.url,
+      data: response.data
+    });
+    return response;
+  },
+  (error) => {
+    console.error('Response error:', {
+      status: error.response?.status,
+      url: error.config?.url,
+      message: error.response?.data
+    });
+    return Promise.reject(error);
+  }
+);
 
 // Unified API service
 export const apiService = {
@@ -23,10 +64,17 @@ export const apiService = {
     }
     
     try {
+      console.log('Attempting login with:', { email, passwordLength: password.length });
       const response = await apiClient.post('/login', { email, password });
+      console.log('Login successful:', response.data);
       return { success: true, data: response.data };
     } catch (error) {
-      throw new Error(error.response?.data?.message || 'Login failed');
+      console.error('Login failed:', {
+        status: error.response?.status,
+        message: error.response?.data,
+        email: email
+      });
+      throw new Error(error.response?.data?.message || error.response?.data || 'Login failed');
     }
   },
 
@@ -36,10 +84,21 @@ export const apiService = {
     }
     
     try {
+      console.log('Attempting signup with:', { 
+        email: userData.emailId, 
+        firstName: userData.firstName,
+        lastName: userData.lastName 
+      });
       const response = await apiClient.post('/signup', userData);
+      console.log('Signup successful:', response.data);
       return { success: true, data: response.data };
     } catch (error) {
-      throw new Error(error.response?.data?.message || 'Signup failed');
+      console.error('Signup failed:', {
+        status: error.response?.status,
+        message: error.response?.data,
+        userData: userData
+      });
+      throw new Error(error.response?.data?.message || error.response?.data || 'Signup failed');
     }
   },
 
@@ -63,9 +122,22 @@ export const apiService = {
     }
     
     try {
+      console.log('Attempting to fetch profile from:', `${BASE_URL}/profile/view`);
       const response = await apiClient.get('/profile/view');
+      console.log('Profile fetch successful:', response.data);
       return { success: true, data: response.data };
     } catch (error) {
+      console.error('Profile fetch error:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        url: error.config?.url
+      });
+      
+      // Handle authentication errors specifically
+      if (error.response?.status === 400 || error.response?.status === 401) {
+        throw new Error('Unauthorized');
+      }
       throw new Error(error.response?.data?.message || 'Failed to fetch profile');
     }
   },

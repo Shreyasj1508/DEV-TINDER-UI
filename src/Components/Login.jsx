@@ -2,11 +2,11 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { useNavigate } from "react-router-dom";
-import { apiService } from "../utils/apiService";
+import { apiService, setUseMockBackend } from "../utils/apiService";
 
 const Login = () => {
-  const [emailId, setEmailId] = useState("shreyas50@gmail.com");
-  const [password, setPassword] = useState("Shreyas50@");
+  const [emailId, setEmailId] = useState("Alice1@gmail.com");
+  const [password, setPassword] = useState("Alice1@@");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [isLoginForm, setIsLoginForm] = useState(true);

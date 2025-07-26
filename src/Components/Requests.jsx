@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { addRequests, removeRequest } from "../utils/requestSlice";
+import { addConnections, addConnection } from "../utils/connectionSlice";
 import { useEffect, useState } from "react";
 import { apiService } from "../utils/apiService";
 import LoadingSpinner from "./LoadingSpinner";
@@ -14,10 +15,37 @@ const Requests = () => {
   const reviewRequest = async (status, requestId) => {
     try {
       setProcessingRequest(requestId);
+      console.log(`Reviewing request ${requestId} with status: ${status}`);
+      
       const response = await apiService.reviewConnectionRequest(status, requestId);
       
       if (response.success) {
+        // If request was accepted, add the user to connections immediately
+        if (status === 'accepted') {
+          // Find the user data from the current request
+          const acceptedUser = requests.find(req => req._id === requestId);
+          if (acceptedUser) {
+            console.log('Adding accepted user to connections:', acceptedUser);
+            dispatch(addConnection(acceptedUser));
+          }
+        }
+        
+        // Remove the request from requests list
         dispatch(removeRequest(requestId));
+        
+        // If request was accepted, also refresh connections to ensure sync
+        if (status === 'accepted') {
+          console.log('Request accepted, refreshing connections for sync...');
+          try {
+            const connectionsResponse = await apiService.getConnections();
+            if (connectionsResponse.success) {
+              dispatch(addConnections(connectionsResponse.data));
+              console.log('Connections synced successfully');
+            }
+          } catch (err) {
+            console.error('Error refreshing connections:', err);
+          }
+        }
       }
     } catch (err) {
       console.error("Error reviewing request:", err);

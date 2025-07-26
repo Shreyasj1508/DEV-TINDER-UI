@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addFeed, removeUserFromFeed } from "../utils/feedSlice";
+import { addConnections } from "../utils/connectionSlice";
+import { addRequests } from "../utils/requestSlice";
 import UserCard from "./userCard";
 import { apiService } from "../utils/apiService";
 import LoadingSpinner from "./LoadingSpinner";
@@ -9,6 +11,8 @@ const Feed = () => {
   const dispatch = useDispatch();
   const feed = useSelector((store) => store.feed);
   const user = useSelector((store) => store.user);
+  const connections = useSelector((store) => store.connections);
+  const requests = useSelector((store) => store.requests);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [swipeStats, setSwipeStats] = useState({ likes: 0, passes: 0 });
@@ -17,8 +21,60 @@ const Feed = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const getFeed = async () => {
-    if (feed && feed.length > 0) {
+  // Filter feed to exclude users already in connections or requests
+  const getFilteredFeed = () => {
+    if (!feed || !Array.isArray(feed)) return [];
+    
+    // Get IDs of users already connected or requested
+    const connectedUserIds = new Set();
+    const requestedUserIds = new Set();
+    
+    // Add connection IDs
+    if (connections && Array.isArray(connections)) {
+      connections.forEach(connection => {
+        if (connection._id) connectedUserIds.add(connection._id);
+      });
+    }
+    
+    // Add request IDs (both sent and received)
+    if (requests && Array.isArray(requests)) {
+      requests.forEach(request => {
+        if (request._id) requestedUserIds.add(request._id);
+        // Also check for fromUserId and toUserId in case of different request structure
+        if (request.fromUserId) requestedUserIds.add(request.fromUserId);
+        if (request.toUserId) requestedUserIds.add(request.toUserId);
+      });
+    }
+    
+    // Filter out current user, connections, and requests
+    const filtered = feed.filter(feedUser => {
+      if (!feedUser._id) return false;
+      if (feedUser._id === user?._id) return false; // Don't show current user
+      if (connectedUserIds.has(feedUser._id)) return false; // Don't show connected users
+      if (requestedUserIds.has(feedUser._id)) return false; // Don't show requested users
+      return true;
+    });
+    
+    console.log('Feed filtering:', {
+      totalFeed: feed.length,
+      connections: connectedUserIds.size,
+      requests: requestedUserIds.size,
+      filteredFeed: filtered.length,
+      connectedIds: Array.from(connectedUserIds),
+      requestedIds: Array.from(requestedUserIds)
+    });
+    
+    return filtered;
+  };
+
+  const filteredFeed = getFilteredFeed();
+
+  const getFeed = async (forceRefresh = false) => {
+    // Check filtered feed length instead of raw feed
+    const currentFilteredFeed = getFilteredFeed();
+    
+    // Only skip if we have plenty of filtered users and not forcing refresh
+    if (!forceRefresh && currentFilteredFeed.length > 2) {
       setLoading(false);
       return;
     }
@@ -26,12 +82,24 @@ const Feed = () => {
     try {
       setLoading(true);
       setError(null);
-      console.log("Fetching feed...");
+      console.log("Fetching feed...", forceRefresh ? "(forced)" : "", `Current filtered: ${currentFilteredFeed.length}`);
       const response = await apiService.getFeed();
       
       if (response.success) {
         console.log("Feed response:", response.data);
         dispatch(addFeed(response.data));
+        
+        // After adding new feed, check if we still need more users
+        setTimeout(() => {
+          const newFilteredFeed = getFilteredFeed();
+          console.log(`After fetch - Filtered feed: ${newFilteredFeed.length}`);
+          
+          // If still low after fetch, try again (but prevent infinite loop)
+          if (newFilteredFeed.length <= 1 && !forceRefresh) {
+            console.log("Still low users after fetch, trying again...");
+            getFeed(true);
+          }
+        }, 500);
       }
     } catch (err) {
       console.log("Error fetching feed:", err);
@@ -92,19 +160,47 @@ const Feed = () => {
   useEffect(() => {
     console.log("Feed component mounted, current feed:", feed);
     getFeed();
+    
+    // Also fetch connections and requests to ensure filtering works
+    const fetchUserData = async () => {
+      try {
+        // Fetch connections
+        const connectionsResponse = await apiService.getConnections();
+        if (connectionsResponse.success) {
+          dispatch(addConnections(connectionsResponse.data || []));
+        }
+        
+        // Fetch requests
+        const requestsResponse = await apiService.getReceivedRequests();
+        if (requestsResponse.success) {
+          dispatch(addRequests(requestsResponse.data || []));
+        }
+      } catch (err) {
+        console.log("Error fetching user data for filtering:", err);
+      }
+    };
+    
+    fetchUserData();
   }, []);
 
-  // Auto-refresh feed when empty
+  // Auto-refresh feed when filtered feed gets low
   useEffect(() => {
-    if (feed && feed.length === 0) {
+    const currentFilteredFeed = getFilteredFeed();
+    if (currentFilteredFeed.length <= 1) {
+      console.log(`Filtered feed is getting low (${currentFilteredFeed.length}), refreshing...`);
       const timer = setTimeout(() => {
-        getFeed();
-      }, 3000);
+        getFeed(true); // Force refresh
+      }, 1000);
       return () => clearTimeout(timer);
     }
-  }, [feed]);
+  }, [feed, connections, requests]); // Re-run when any of these change
 
-  console.log("Feed state:", feed, "Is array:", Array.isArray(feed), "Length:", feed?.length);
+  console.log("Feed state:", {
+    rawFeed: feed?.length || 0,
+    filteredFeed: filteredFeed.length,
+    connections: connections?.length || 0,
+    requests: requests?.length || 0
+  });
 
   if (loading) {
     return (
@@ -122,7 +218,7 @@ const Feed = () => {
           <h1 className="text-2xl font-bold text-gray-800 mb-2">Error Loading Feed</h1>
           <p className="text-gray-600 mb-4">{error}</p>
           <button 
-            onClick={getFeed}
+            onClick={() => getFeed(true)}
             className="px-6 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full font-semibold hover:from-pink-600 hover:to-purple-600 transition-all duration-300"
           >
             Try Again
@@ -134,7 +230,7 @@ const Feed = () => {
 
   if (!Array.isArray(feed)) return null;
 
-  if (feed.length <= 0)
+  if (filteredFeed.length <= 0)
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-50 to-indigo-100 flex items-center justify-center relative overflow-hidden">
         {/* Animated Background */}
@@ -145,45 +241,33 @@ const Feed = () => {
         </div>
         
         <div className="text-center relative z-10">
-          <div className="text-8xl mb-6 animate-bounce">💔</div>
-          <h1 className="text-4xl font-bold text-gray-800 mb-4 animate-fade-in">No more matches!</h1>
-          <p className="text-xl text-gray-600 mb-8 animate-fade-in-delay">Check back later for new developers</p>
-          
-          {/* Loading Animation */}
-          <div className="flex items-center justify-center gap-2 mb-6">
-            <div className="w-3 h-3 bg-pink-500 rounded-full animate-bounce"></div>
-            <div className="w-3 h-3 bg-purple-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-            <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+          <div className="text-8xl mb-6 animate-bounce">💝</div>
+          <h1 className="text-3xl font-bold text-gray-800 mb-4">
+            No New People to Discover
+          </h1>
+          <p className="text-gray-600 mb-6 max-w-md">
+            {feed.length > 0 
+              ? "You've seen everyone available! Check back later for new profiles." 
+              : "Loading new profiles for you..."
+            }
+          </p>
+          <div className="space-y-3">
+            <button 
+              onClick={() => getFeed(true)}
+              className="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full font-semibold hover:from-pink-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-105 shadow-lg"
+            >
+              🔄 Refresh Feed
+            </button>
+            <p className="text-sm text-gray-500">
+              Raw feed: {feed.length} | Available: {filteredFeed.length}
+            </p>
           </div>
-          
-          <button 
-            onClick={getFeed}
-            className="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full font-semibold hover:from-pink-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-          >
-            🔄 Refresh Feed
-          </button>
-          
-          {/* Fun Stats */}
-          {(swipeStats.likes > 0 || swipeStats.passes > 0) && (
-            <div className="mt-8 p-4 bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/40">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Your Session Stats</h3>
-              <div className="flex gap-6 justify-center">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-pink-500">{swipeStats.likes}</div>
-                  <div className="text-sm text-gray-600">Likes</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-500">{swipeStats.passes}</div>
-                  <div className="text-sm text-gray-600">Passes</div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     );
 
-  const currentUser = feed[0]; // Always show the first user in the array
+  const currentUser = filteredFeed[0];
+  if (!currentUser) return null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-50 to-indigo-100 relative overflow-hidden">
@@ -216,7 +300,10 @@ const Feed = () => {
           <p className="text-gray-600 text-base md:text-lg">Find your perfect coding partner</p>
           <div className="mt-3 md:mt-4 flex items-center justify-center gap-2 flex-wrap">
             <div className="px-3 md:px-4 py-1.5 md:py-2 bg-white/70 backdrop-blur-sm rounded-full text-xs md:text-sm font-medium text-gray-700 shadow-sm">
-              📍 {feed.length} developer{feed.length !== 1 ? 's' : ''} remaining
+              📍 {filteredFeed.length} developer{filteredFeed.length !== 1 ? 's' : ''} available
+            </div>
+            <div className="px-3 md:px-4 py-1.5 md:py-2 bg-gray-500/70 backdrop-blur-sm rounded-full text-xs md:text-sm font-medium text-white shadow-sm">
+              🔄 {feed?.length || 0} total fetched
             </div>
             {user?.firstName && (
               <div className="px-3 md:px-4 py-1.5 md:py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full text-xs md:text-sm font-medium shadow-sm">
@@ -252,7 +339,7 @@ const Feed = () => {
         {/* Card Stack Container */}
         <div className="relative w-full max-w-sm md:max-w-md lg:max-w-lg px-2">
           {/* Background Cards for Stack Effect */}
-          {feed.slice(1, 3).map((user, index) => (
+          {filteredFeed.slice(1, 3).map((user, index) => (
             <div
               key={user._id}
               className="absolute top-1 left-1 right-1 md:top-2 md:left-2 md:right-2"
@@ -271,6 +358,22 @@ const Feed = () => {
             <UserCard user={currentUser} />
           </div>
         </div>
+
+        {/* Feed Status Debug Info - Remove in production */}
+        <div className="fixed top-20 left-4 bg-black/70 text-white p-2 rounded text-xs z-50">
+          Feed: {filteredFeed.length}/{feed?.length || 0} users
+        </div>
+
+        {/* Floating Refresh Button */}
+        <button
+          onClick={() => getFeed(true)}
+          className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-200 flex items-center justify-center z-20"
+          title="Refresh Feed"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+        </button>
       </div>
     </div>
   );
