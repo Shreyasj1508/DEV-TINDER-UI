@@ -557,16 +557,6 @@ const Feed = () => {
           <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite] opacity-20"></div>
           <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite] opacity-10 animation-delay-300"></div>
         </button>
-
-        {/* Enhanced Progress Indicator with animations */}
-        <div className="fixed bottom-6 left-6 bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg border border-white/20 z-20 animate-[slideInLeft_0.6s_ease-out] hover:scale-105 transition-all duration-300">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full animate-[heartbeat_1.5s_ease-in-out_infinite]"></div>
-            <span className="text-sm font-medium text-gray-700 animate-[fadeIn_0.5s_ease-out]">
-              {filteredFeed.length} remaining
-            </span>
-          </div>
-        </div>
       </div>
     </div>
   );
