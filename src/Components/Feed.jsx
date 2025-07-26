@@ -20,8 +20,6 @@ const Feed = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [animationDirection, setAnimationDirection] = useState(null); // 'left', 'right', 'up'
-  const [swipeStats, setSwipeStats] = useState({ likes: 0, passes: 0 });
-  const [showStats, setShowStats] = useState(false);
   const [recentAction, setRecentAction] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -165,11 +163,9 @@ const Feed = () => {
     // Set animation direction based on action
     if (direction === "right") {
       setAnimationDirection('right');
-      setSwipeStats((prev) => ({ ...prev, likes: prev.likes + 1 }));
       setRecentAction({ type: "like", text: "💖 Liked!" });
     } else {
       setAnimationDirection('left');
-      setSwipeStats((prev) => ({ ...prev, passes: prev.passes + 1 }));
       setRecentAction({ type: "pass", text: "👋 Passed" });
     }
 
@@ -181,29 +177,6 @@ const Feed = () => {
       setIsAnimating(false);
       setAnimationDirection(null);
     }, 500); // Increased duration for smoother animation
-  };
-
-  const handleSuperLike = async (userId) => {
-    if (isAnimating) return;
-
-    try {
-      setIsAnimating(true);
-      setAnimationDirection('up'); // Super like animates upward
-      await apiService.sendConnectionRequest("interested", userId);
-
-      setRecentAction({ type: "superlike", text: "⭐ Super Liked!" });
-      setTimeout(() => setRecentAction(null), 2000);
-
-      setTimeout(() => {
-        dispatch(removeUserFromFeed(userId));
-        setIsAnimating(false);
-        setAnimationDirection(null);
-      }, 500);
-    } catch (err) {
-      console.log("Super like error:", err);
-      setIsAnimating(false);
-      setAnimationDirection(null);
-    }
   };
 
   useEffect(() => {
@@ -355,36 +328,7 @@ const Feed = () => {
                 👋 Hi {userData.firstName}!
               </div>
             )}
-            <button
-              onClick={() => setShowStats(!showStats)}
-              className="px-3 py-1 bg-blue-500/70 backdrop-blur-sm rounded-full text-xs font-medium text-white shadow-sm hover:bg-blue-600/70 transition-all"
-            >
-              📊 Stats
-            </button>
           </div>
-
-          {/* Stats Panel */}
-          {showStats && (
-            <div className="mt-3 p-3 bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/40 max-w-xs mx-auto animate-fade-in">
-              <h3 className="text-base font-semibold text-gray-800 mb-2">
-                Session Stats
-              </h3>
-              <div className="flex gap-6 justify-center">
-                <div className="text-center">
-                  <div className="text-xl font-bold text-pink-500">
-                    {swipeStats.likes}
-                  </div>
-                  <div className="text-xs text-gray-600">💖 Likes</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xl font-bold text-gray-500">
-                    {swipeStats.passes}
-                  </div>
-                  <div className="text-xs text-gray-600">👋 Passes</div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Card Stack Container */}
@@ -418,7 +362,7 @@ const Feed = () => {
                 : 'transform translate-x-0 translate-y-0 opacity-100 rotate-0 scale-100'
             }`}
           >
-            <UserCard user={currentUser} onSwipe={handleSwipe} onSuperLike={handleSuperLike} />
+            <UserCard user={currentUser} onSwipe={handleSwipe} />
           </div>
         </div>
 
