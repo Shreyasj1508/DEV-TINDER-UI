@@ -124,7 +124,7 @@ const Connections = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl mx-auto">
           {connections.map((connection, index) => {
             const { _id, firstName, lastName, photoURL, photoUrl, photo, picture, avatar, age, gender, about, skills } = connection;
             const imageUrl = photoURL || photoUrl || photo || picture || avatar;
@@ -132,17 +132,17 @@ const Connections = () => {
             return (
               <div
                 key={_id}
-                className="group bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl overflow-hidden transform transition-all duration-500 hover:scale-105 hover:shadow-3xl border border-white/30 animate-fade-in hover:bg-white relative"
+                className="group bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden transform transition-all duration-500 hover:scale-105 hover:shadow-2xl border border-white/30 animate-fade-in hover:bg-white relative h-[420px] flex flex-col"
                 style={{ animationDelay: `${index * 0.15}s` }}
               >
                 {/* Card Header with Image */}
-                <div className="relative h-64 overflow-hidden">
+                <div className="relative h-48 overflow-hidden flex-shrink-0">
                   <img
                     alt={`${firstName} ${lastName}`}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     src={imageUrl}
                     onError={(e) => {
-                      e.target.src = `https://ui-avatars.com/api/?name=${firstName}+${lastName}&background=ec4899&color=fff&size=400&bold=true`;
+                      e.target.src = `https://ui-avatars.com/api/?name=${firstName}+${lastName}&background=ec4899&color=fff&size=300&bold=true`;
                     }}
                   />
                   
@@ -151,16 +151,16 @@ const Connections = () => {
                   
                   {/* Interactive Elements */}
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20 flex items-center justify-center">
-                    <div className="bg-white/90 backdrop-blur-md rounded-full p-4 transform scale-0 group-hover:scale-100 transition-transform duration-300">
-                      <svg className="w-8 h-8 text-pink-500" fill="currentColor" viewBox="0 0 24 24">
+                    <div className="bg-white/90 backdrop-blur-md rounded-full p-3 transform scale-0 group-hover:scale-100 transition-transform duration-300">
+                      <svg className="w-6 h-6 text-pink-500" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                       </svg>
                     </div>
                   </div>
 
                   {/* Match Badge */}
-                  <div className="absolute top-4 left-4">
-                    <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white px-4 py-2 rounded-2xl text-xs font-bold shadow-xl animate-bounce">
+                  <div className="absolute top-3 left-3">
+                    <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white px-3 py-1 rounded-xl text-xs font-bold shadow-lg">
                       <span className="flex items-center gap-1">
                         💕 CONNECTED
                       </span>
@@ -168,16 +168,16 @@ const Connections = () => {
                   </div>
                   
                   {/* Name and Basic Info */}
-                  <div className="absolute bottom-4 left-4 right-4 text-white">
-                    <h3 className="text-xl font-bold drop-shadow-2xl mb-1">
+                  <div className="absolute bottom-3 left-3 right-3 text-white">
+                    <h3 className="text-lg font-bold drop-shadow-2xl mb-1">
                       {firstName} {lastName}
                     </h3>
                     {age && gender && (
-                      <p className="text-sm opacity-90 drop-shadow-md flex items-center gap-2">
-                        <span className="bg-white/20 backdrop-blur-sm rounded-full px-2 py-1">
-                          {age} years
+                      <p className="text-xs opacity-90 drop-shadow-md flex items-center gap-1">
+                        <span className="bg-white/20 backdrop-blur-sm rounded-full px-2 py-0.5">
+                          {age}
                         </span>
-                        <span className="bg-white/20 backdrop-blur-sm rounded-full px-2 py-1">
+                        <span className="bg-white/20 backdrop-blur-sm rounded-full px-2 py-0.5">
                           {gender}
                         </span>
                       </p>
@@ -186,77 +186,69 @@ const Connections = () => {
                 </div>
                 
                 {/* Card Content */}
-                <div className="p-6 space-y-4">
+                <div className="p-4 flex-1 flex flex-col justify-between">
                   {/* About Section */}
-                  {about && (
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                        </svg>
-                        About
-                      </h4>
-                      <p className="text-gray-700 text-sm leading-relaxed line-clamp-3 hover:line-clamp-none transition-all cursor-pointer bg-gray-50 rounded-lg p-3 hover:bg-gray-100">
-                        {about}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Skills/Interests */}
-                  {skills && skills.length > 0 && (
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Skills
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        {skills.slice(0, 4).map((skill, idx) => (
-                          <span key={idx} className="px-3 py-1 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 rounded-full text-xs font-medium">
-                            {skill}
-                          </span>
-                        ))}
-                        {skills.length > 4 && (
-                          <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">
-                            +{skills.length - 4} more
-                          </span>
-                        )}
+                  <div className="space-y-3 flex-1">
+                    {about && (
+                      <div className="space-y-1">
+                        <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1">
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                          </svg>
+                          About
+                        </h4>
+                        <p className="text-gray-700 text-xs leading-relaxed line-clamp-2 bg-gray-50 rounded-lg p-2">
+                          {about}
+                        </p>
                       </div>
-                    </div>
-                  )}
+                    )}
+
+                    {/* Skills/Interests */}
+                    {skills && skills.length > 0 && (
+                      <div className="space-y-1">
+                        <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1">
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          Skills
+                        </h4>
+                        <div className="flex flex-wrap gap-1">
+                          {skills.slice(0, 3).map((skill, idx) => (
+                            <span key={idx} className="px-2 py-0.5 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 rounded-full text-xs font-medium">
+                              {skill}
+                            </span>
+                          ))}
+                          {skills.length > 3 && (
+                            <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">
+                              +{skills.length - 3}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                   
                   {/* Action Buttons */}
-                  <div className="flex gap-3 pt-2">
+                  <div className="flex gap-2 pt-3">
                     <Link to={"/chat/" + _id} className="flex-1">
-                      <button className="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 text-white font-bold py-4 px-6 rounded-2xl shadow-xl transform transition-all duration-300 hover:scale-105 hover:shadow-2xl active:scale-95 flex items-center justify-center gap-3 group">
-                        <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                      <button className="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center gap-2 group">
+                        <svg className="w-4 h-4 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-3 12H7v-2h10v2zm0-3H7V9h10v2zm0-3H7V6h10v2z"/>
                         </svg>
-                        <span className="font-bold">Start Chat</span>
+                        <span className="font-bold text-sm">Chat</span>
                       </button>
                     </Link>
                     
-                    <button className="px-4 py-4 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 rounded-2xl transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl group">
-                      <svg className="w-5 h-5 text-gray-600 group-hover:text-pink-500 transition-colors" fill="currentColor" viewBox="0 0 20 20">
+                    <button className="px-3 py-2.5 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg group">
+                      <svg className="w-4 h-4 text-gray-600 group-hover:text-pink-500 transition-colors" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
                       </svg>
                     </button>
                   </div>
-                  
-                  {/* Connection Metadata */}
-                  <div className="flex items-center justify-between text-xs text-gray-500 pt-4 border-t border-gray-100">
-                    <span className="flex items-center gap-2 bg-pink-50 text-pink-600 px-3 py-1.5 rounded-full font-medium">
-                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
-                      </svg>
-                      Connected {Math.floor(Math.random() * 30) + 1}d ago
-                    </span>
-                  </div>
                 </div>
 
                 {/* Hover Effect Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-pink-400/10 via-purple-400/10 to-indigo-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-3xl"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-pink-400/10 via-purple-400/10 to-indigo-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl"></div>
               </div>
             );
           })}

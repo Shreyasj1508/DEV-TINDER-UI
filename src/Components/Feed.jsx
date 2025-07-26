@@ -19,6 +19,7 @@ const Feed = () => {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [animationDirection, setAnimationDirection] = useState(null); // 'left', 'right', 'up'
   const [swipeStats, setSwipeStats] = useState({ likes: 0, passes: 0 });
   const [showStats, setShowStats] = useState(false);
   const [recentAction, setRecentAction] = useState(null);
@@ -160,12 +161,14 @@ const Feed = () => {
     if (isAnimating) return;
 
     setIsAnimating(true);
-
-    // Update stats and show recent action
+    
+    // Set animation direction based on action
     if (direction === "right") {
+      setAnimationDirection('right');
       setSwipeStats((prev) => ({ ...prev, likes: prev.likes + 1 }));
       setRecentAction({ type: "like", text: "💖 Liked!" });
     } else {
+      setAnimationDirection('left');
       setSwipeStats((prev) => ({ ...prev, passes: prev.passes + 1 }));
       setRecentAction({ type: "pass", text: "👋 Passed" });
     }
@@ -176,7 +179,8 @@ const Feed = () => {
     setTimeout(() => {
       dispatch(removeUserFromFeed(userId));
       setIsAnimating(false);
-    }, 300);
+      setAnimationDirection(null);
+    }, 500); // Increased duration for smoother animation
   };
 
   const handleSuperLike = async (userId) => {
@@ -184,6 +188,7 @@ const Feed = () => {
 
     try {
       setIsAnimating(true);
+      setAnimationDirection('up'); // Super like animates upward
       await apiService.sendConnectionRequest("interested", userId);
 
       setRecentAction({ type: "superlike", text: "⭐ Super Liked!" });
@@ -192,10 +197,12 @@ const Feed = () => {
       setTimeout(() => {
         dispatch(removeUserFromFeed(userId));
         setIsAnimating(false);
-      }, 300);
+        setAnimationDirection(null);
+      }, 500);
     } catch (err) {
       console.log("Super like error:", err);
       setIsAnimating(false);
+      setAnimationDirection(null);
     }
   };
 
@@ -400,8 +407,18 @@ const Feed = () => {
           ))}
 
           {/* Main Card */}
-          <div className="relative z-10">
-            <UserCard user={currentUser} />
+          <div 
+            className={`relative z-10 transition-all duration-500 ease-out ${
+              isAnimating && animationDirection === 'left' 
+                ? 'transform -translate-x-full opacity-0 rotate-[-15deg]' 
+                : isAnimating && animationDirection === 'right'
+                ? 'transform translate-x-full opacity-0 rotate-[15deg]'
+                : isAnimating && animationDirection === 'up'
+                ? 'transform -translate-y-full opacity-0 scale-110'
+                : 'transform translate-x-0 translate-y-0 opacity-100 rotate-0 scale-100'
+            }`}
+          >
+            <UserCard user={currentUser} onSwipe={handleSwipe} onSuperLike={handleSuperLike} />
           </div>
         </div>
 

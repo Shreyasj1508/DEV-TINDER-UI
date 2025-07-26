@@ -3,7 +3,7 @@ import { removeUserFromFeed } from "../utils/feedSlice";
 import { apiService } from "../utils/apiService";
 import { useState, useEffect } from "react";
 
-const UserCard = ({ user }) => {
+const UserCard = ({ user, onSwipe, onSuperLike }) => {
   const dispatch = useDispatch();
   const [isAnimating, setIsAnimating] = useState(false);
   const [error, setError] = useState(null);
@@ -40,6 +40,17 @@ const UserCard = ({ user }) => {
   const handleSendRequest = async (status, userId) => {
     if (isAnimating) return;
     
+    // If we have callback functions from Feed, use them for better animations
+    if (onSwipe) {
+      if (status === "ignored") {
+        onSwipe("left", userId);
+      } else if (status === "interested") {
+        onSwipe("right", userId);
+      }
+      return;
+    }
+    
+    // Fallback to direct API call if no callbacks provided
     setIsAnimating(true);
     setError(null);
     
@@ -235,28 +246,47 @@ const UserCard = ({ user }) => {
 
         {/* Action Buttons - Only show if there's an _id (not in preview mode) */}
         {_id && (
-          <div className="flex gap-2 mt-3">
-            {/* Pass Button */}
-            <button
-              className={`flex-1 bg-gray-100 hover:bg-red-100 text-gray-700 hover:text-red-600 font-semibold py-2 px-4 rounded-xl border border-gray-200 hover:border-red-300 transition-all duration-200 ${
-                isAnimating ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'
-              }`}
-              onClick={() => handleSendRequest("ignored", _id)}
-              disabled={isAnimating}
-            >
-              {isAnimating ? '...' : 'Pass'}
-            </button>
+          <div className="space-y-2 mt-3">
+            {/* Super Like Button */}
+            {onSuperLike && (
+              <button
+                className={`w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-2.5 px-4 rounded-xl shadow-lg hover:shadow-blue-300/50 transition-all duration-300 ${
+                  isAnimating ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 hover:-translate-y-1'
+                } flex items-center justify-center gap-2`}
+                onClick={() => onSuperLike(_id)}
+                disabled={isAnimating}
+              >
+                <span className="text-lg">⭐</span>
+                {isAnimating ? 'Super Liking...' : 'Super Like'}
+              </button>
+            )}
+            
+            {/* Pass and Like Buttons */}
+            <div className="flex gap-2">
+              {/* Pass Button */}
+              <button
+                className={`flex-1 bg-gray-100 hover:bg-red-100 text-gray-700 hover:text-red-600 font-semibold py-2.5 px-4 rounded-xl border border-gray-200 hover:border-red-300 transition-all duration-300 ${
+                  isAnimating ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 hover:-translate-y-1'
+                } flex items-center justify-center gap-2`}
+                onClick={() => handleSendRequest("ignored", _id)}
+                disabled={isAnimating}
+              >
+                <span className="text-lg">👎</span>
+                {isAnimating ? '...' : 'Pass'}
+              </button>
 
-            {/* Like Button */}
-            <button
-              className={`flex-1 bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white font-semibold py-2 px-4 rounded-xl shadow-lg hover:shadow-pink-300/50 transition-all duration-200 ${
-                isAnimating ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'
-              }`}
-              onClick={() => handleSendRequest("interested", _id)}
-              disabled={isAnimating}
-            >
-              {isAnimating ? '...' : 'Like'}
-            </button>
+              {/* Like Button */}
+              <button
+                className={`flex-1 bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white font-semibold py-2.5 px-4 rounded-xl shadow-lg hover:shadow-pink-300/50 transition-all duration-300 ${
+                  isAnimating ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 hover:-translate-y-1'
+                } flex items-center justify-center gap-2`}
+                onClick={() => handleSendRequest("interested", _id)}
+                disabled={isAnimating}
+              >
+                <span className="text-lg">❤️</span>
+                {isAnimating ? '...' : 'Like'}
+              </button>
+            </div>
           </div>
         )}
 
