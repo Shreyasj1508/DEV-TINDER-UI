@@ -448,37 +448,37 @@ const Feed = () => {
           </div>
         )}
 
-        {/* Enhanced Header Section with floating animations */}
-        <div className="mb-6 md:mb-8 text-center animate-[fadeInDown_0.8s_ease-out]">
-          <div className="mb-4">
-            <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-full px-6 py-3 shadow-lg border border-white/20 mb-4 hover:scale-105 transition-all duration-300 animate-[floatSlow_3s_ease-in-out_infinite]">
-              <span className="text-2xl animate-[sparkle_2s_ease-in-out_infinite]">
+        {/* Compact Header Section */}
+        <div className="mb-3 md:mb-4 text-center animate-[fadeInDown_0.8s_ease-out]">
+          <div className="mb-2">
+            <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg border border-white/20 mb-2 hover:scale-105 transition-all duration-300 animate-[floatSlow_3s_ease-in-out_infinite]">
+              <span className="text-lg animate-[sparkle_2s_ease-in-out_infinite]">
                 ✨
               </span>
-              <span className="text-lg font-semibold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-sm font-semibold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
                 Dev Discovery
               </span>
             </div>
           </div>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-3 leading-tight animate-[slideInLeft_0.6s_ease-out]">
+          <h1 className="text-xl md:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-2 leading-tight animate-[slideInLeft_0.6s_ease-out]">
             Find Your Coding Soulmate
           </h1>
-          <p className="text-gray-600 text-base md:text-lg max-w-md mx-auto leading-relaxed animate-[fadeIn_1s_ease-out_0.3s_both]">
+          <p className="text-gray-600 text-sm md:text-base max-w-md mx-auto leading-relaxed animate-[fadeIn_1s_ease-out_0.3s_both]">
             Swipe through amazing developers and build your dream network
           </p>
 
-          {/* Enhanced Stats and User Info with staggered animations */}
-          <div className="mt-4 md:mt-6 flex items-center justify-center gap-3 flex-wrap">
-            <div className="px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full text-sm font-medium text-gray-700 shadow-md border border-white/20 hover:scale-105 transition-all duration-300 animate-[slideInUp_0.6s_ease-out_0.2s_both] hover:shadow-lg">
-              <span className="text-base mr-1 animate-[bounce_1s_ease-in-out_infinite]">
+          {/* Compact Stats and User Info */}
+          <div className="mt-2 md:mt-3 flex items-center justify-center gap-2 flex-wrap">
+            <div className="px-3 py-1.5 bg-white/80 backdrop-blur-sm rounded-full text-xs font-medium text-gray-700 shadow-md border border-white/20 hover:scale-105 transition-all duration-300 animate-[slideInUp_0.6s_ease-out_0.2s_both] hover:shadow-lg">
+              <span className="text-sm mr-1 animate-[bounce_1s_ease-in-out_infinite]">
                 🎯
               </span>
               {filteredFeed.length} developer
               {filteredFeed.length !== 1 ? "s" : ""} nearby
             </div>
             {userData?.firstName && (
-              <div className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full text-sm font-semibold shadow-md hover:scale-105 transition-all duration-300 animate-[slideInUp_0.6s_ease-out_0.4s_both] hover:shadow-xl">
-                <span className="text-base mr-1 animate-[wave_1s_ease-in-out_infinite]">
+              <div className="px-3 py-1.5 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full text-xs font-semibold shadow-md hover:scale-105 transition-all duration-300 animate-[slideInUp_0.6s_ease-out_0.4s_both] hover:shadow-xl">
+                <span className="text-sm mr-1 animate-[wave_1s_ease-in-out_infinite]">
                   👋
                 </span>
                 Welcome back, {userData.firstName}!
