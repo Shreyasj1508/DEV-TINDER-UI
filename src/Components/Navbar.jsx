@@ -118,6 +118,31 @@ const NavBar = () => {
               <ChatDropdown />
 
               <Link
+                to="/chats"
+                className={`hidden lg:flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-300 transform hover:scale-105 hover:-translate-y-0.5 relative ${
+                  isActive("/chats") || location.pathname.startsWith("/chat/")
+                    ? "bg-gradient-to-r from-pink-100 to-purple-100 text-pink-600 shadow-lg scale-105"
+                    : "text-gray-600 hover:bg-gradient-to-r hover:from-pink-50 hover:to-purple-50 hover:text-pink-500 hover:shadow-md"
+                }`}
+              >
+                <svg
+                  className={`w-5 h-5 transition-all duration-300 ${isActive("/chats") || location.pathname.startsWith("/chat/") ? "animate-pulse" : "group-hover:scale-110"}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                  />
+                </svg>
+                <span className="font-medium">Chats</span>
+                {(isActive("/chats") || location.pathname.startsWith("/chat/")) && <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-pink-500 rounded-full animate-bounce"></div>}
+              </Link>
+
+              <Link
                 to="/requests"
                 className={`hidden lg:flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-300 transform hover:scale-105 hover:-translate-y-0.5 relative ${
                   isActive("/requests")
