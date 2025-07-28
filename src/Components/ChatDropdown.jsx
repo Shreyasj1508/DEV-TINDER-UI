@@ -62,22 +62,23 @@ const ChatDropdown = () => {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      {/* Chat Button */}
+      {/* Chat Button - Responsive */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`relative p-3 rounded-full transition-all duration-200 ${
+        className={`flex items-center space-x-2 px-4 py-2 lg:px-4 lg:py-2 p-3 lg:p-0 rounded-full transition-all duration-200 ${
           isOpen 
-            ? 'bg-blue-100 text-blue-600' 
+            ? 'bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-600 shadow-sm' 
             : 'text-gray-600 hover:bg-gray-100'
         }`}
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
         </svg>
+        <span className="font-medium hidden lg:inline">Chats</span>
         
         {/* Notification badge for unread messages */}
         {recentChats.some(chat => chat.hasUnread) && (
-          <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+          <span className="w-3 h-3 bg-red-500 rounded-full border-2 border-white absolute -top-1 -right-1 lg:static lg:w-2 lg:h-2 lg:ml-1 lg:border-0"></span>
         )}
       </button>
 
