@@ -108,7 +108,7 @@ const UserCard = ({ user }) => {
           
           <button
             className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white rounded-full shadow-xl transform transition-all duration-200 hover:scale-110 active:scale-95 disabled:opacity-50"
-            onClick={() => handleSendRequest("intrested", _id)}
+            onClick={() => handleSendRequest("interested", _id)}
             disabled={isAnimating}
           >
             <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
@@ -118,7 +118,7 @@ const UserCard = ({ user }) => {
           
           <button
             className="flex items-center justify-center w-14 h-14 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg transform transition-all duration-200 hover:scale-110 active:scale-95 disabled:opacity-50"
-            onClick={() => handleSendRequest("intrested", _id)}
+            onClick={() => handleSendRequest("interested", _id)}
             disabled={isAnimating}
           >
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
