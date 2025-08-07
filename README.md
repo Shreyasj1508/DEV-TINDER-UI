@@ -1,75 +1,66 @@
-# DevTinder 🔥 - A Modern Developer Networking Platform
+# DevTinder 🔥
 
-Welcome to **DevTinder**, a beautiful Tinder-like application designed specifically for developers to connect, collaborate, and network with fellow programmers worldwide!
+DevTinder is a modern developer networking platform inspired by Tinder. Connect, chat, and collaborate with fellow programmers.
 
-## ✨ Features
+## Features
+- Beautiful, responsive UI
+- Secure authentication & profile management
+- Swipe to connect
+- Real-time chat & live video calls (WebRTC + Socket.io)
+- Premium upgrades
 
-### 🎨 Beautiful Modern UI
-- **Tinder-inspired card design** with smooth animations
-- **Gradient backgrounds** and modern color schemes
-- **Responsive design** that works on all devices
-- **Glassmorphism effects** and smooth transitions
+## Tech Stack
+- React 19, Vite, Tailwind CSS
+- Redux Toolkit
+- Socket.io, Axios
+- Node.js backend
 
-### 👤 User Management
-- **Secure authentication** with login/signup
-- **Comprehensive profile editing** with real-time preview
-- **Skills showcase** with beautiful pill tags
-- **Photo uploads** with URL support
+## Quick Start
+1. Clone: `git clone <repository-url> && cd DEV-TINDER-UI`
+2. Install: `npm install`
+3. Run: `npm run dev`
+4. Open: `http://localhost:5173`
 
-### 🔄 Networking Features
-- **Swipe-like interactions** with love/reject buttons
-- **Connection requests** management
-- **Real-time chat** with WebSocket integration
-- **Connection management** with beautiful card layouts
+## Video Call Usage
+1. Login on two devices
+2. Go to chat: `/chat/<otherUserId>`
+3. Start/join video call
+4. Allow camera/mic access
 
-### 💎 Premium Features
-- **Multiple subscription tiers** (Silver & Gold)
-- **Razorpay payment integration**
-- **Enhanced profile features** for premium users
-- **Unlimited connections** for premium members
-
-## 🛠️ Tech Stack
-
-- **Frontend**: React 19, Vite, Tailwind CSS, DaisyUI
-- **State Management**: Redux Toolkit
-- **Routing**: React Router DOM
-- **HTTP Client**: Axios
-- **Real-time**: Socket.io Client
-- **Payments**: Razorpay Integration
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js (v16 or higher)
-- npm or yarn
-- A running DevTinder backend server
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd DEV-TINDER-UI
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Start the development server**
-   ```bash
-   npm run dev
-   ```
-
-4. **Open your browser**
-   Navigate to `http://localhost:5173` (or the port shown in terminal)
-
-### Build for Production
-```bash
-npm run build
+## Author
+Shreyas Jaiswal ([GitHub](https://github.com/shreyasj1508))
 npm run preview
 ```
+
+
+## Usage
+
+### Video Call Feature
+
+**How to use video call between two users on different devices:**
+
+1. **Login on two devices:**
+   - User 1 logs in on Device 1.
+   - User 2 logs in on Device 2.
+
+2. **Navigate to chat:**
+   - Both users go to the chat URL with each other: `http://localhost:5173/chat/<otherUserId>`
+   - Replace `<otherUserId>` with the user ID of the person you want to call.
+
+3. **Start and join video call:**
+   - User 1 clicks the "Start Video Call" button in the chat.
+   - User 2 clicks the "Join Video Call" button or receives a prompt to join.
+
+4. **Allow camera and microphone access:**
+   - Both users must allow browser access to their camera and microphone.
+
+5. **Enjoy live video chat:**
+   - The system automatically connects both users in the same room. No manual room ID needed.
+
+6. **End call:**
+   - Either user can click the close button to leave the call.
+
+**Note:** If deployed, replace `localhost:5173` with your domain.
 
 ## 🎯 Key Components
 
@@ -119,83 +110,36 @@ npm run preview
 
 ### Modern UI Elements
 - **Rounded corners** (rounded-xl, rounded-2xl, rounded-3xl)
-- **Shadow effects** (shadow-xl, shadow-2xl)
-- **Backdrop blur** for glassmorphism
-- **Gradient overlays** on images
 
-## 📱 Responsive Design
+# DevTinder 🔥
 
-The application is fully responsive and optimized for:
-- **Desktop** (1200px+)
-- **Tablet** (768px - 1199px)
-- **Mobile** (320px - 767px)
+DevTinder is a modern developer networking platform inspired by Tinder. Connect, chat, and collaborate with fellow programmers.
 
-## 🔧 Configuration
+## Features
+- Beautiful, responsive UI
+- Secure authentication & profile management
+- Swipe to connect
+- Real-time chat & live video calls (WebRTC + Socket.io)
+- Premium upgrades
 
-### Environment Variables
-Create a `.env` file in the root directory:
-```env
-VITE_API_BASE_URL=http://localhost:7777
-```
+## Tech Stack
+- React 19, Vite, Tailwind CSS
+- Redux Toolkit
+- Socket.io, Axios
+- Node.js backend
 
-### Backend Integration
-The app expects a backend server running on `http://localhost:7777` by default. Make sure your backend APIs are available at:
-- `/login` - User authentication
-- `/signup` - User registration
-- `/profile/*` - Profile management
-- `/user/feed` - Get user feed
-- `/user/connections` - Get connections
-- `/user/requests/received` - Get connection requests
-- `/request/send/*` - Send connection requests
-- `/chat/*` - Chat functionality
+## Quick Start
+1. Clone: `git clone <repository-url> && cd DEV-TINDER-UI`
+2. Install: `npm install`
+3. Run: `npm run dev`
+4. Open: `http://localhost:5173`
 
-## 🎉 What's New in This Version
+## Video Call Usage
+1. Login on two devices
+2. Go to chat: `/chat/<otherUserId>`
+3. Start/join video call
+4. Allow camera/mic access
 
+## Author
+Shreyas Jaiswal ([GitHub](https://github.com/shreyasj1508))
 ### ✨ Visual Enhancements
-- **Complete UI overhaul** with Tinder-like design
-- **Modern card layouts** with beautiful shadows and gradients
-- **Enhanced typography** with proper font weights and sizes
-- **Improved color scheme** with consistent brand colors
-
-### 🔄 Improved User Experience
-- **Smooth animations** throughout the application
-- **Better navigation** with modern navbar design
-- **Enhanced forms** with better validation and styling
-- **Responsive design** improvements for mobile devices
-
-### 🚀 Performance Optimizations
-- **Optimized component rendering**
-- **Better state management**
-- **Improved API error handling**
-- **Enhanced loading states**
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 👨‍💻 Developer
-
-**Shreyas Jaiswal**
-- GitHub: [@shreyasj1508](https://github.com/shreyasj1508)
-- LinkedIn: [Shreyas Jaiswal](https://www.linkedin.com/in/shreyas-jaiswal1508/)
-- Twitter: [@shreyas1508_](https://x.com/shreyas1508_)
-
-## 🙏 Acknowledgments
-
-- Inspired by Tinder's beautiful UI/UX design
-- Built with modern React ecosystem
-- Thanks to the open-source community for amazing tools
-
----
-
-**Happy Coding and Networking! 🔥💻**
-
-> "Connect with developers, collaborate on projects, and build amazing things together!"
