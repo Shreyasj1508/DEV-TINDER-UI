@@ -1,17 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { apiService } from '../utils/apiService';
+import { useSocket } from '../utils/socket';
 
 const ChatDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [recentChats, setRecentChats] = useState([]);
   const [loading, setLoading] = useState(false);
   const dropdownRef = useRef(null);
+  const socket = useSocket();
 
   const fetchRecentChats = async () => {
     try {
       setLoading(true);
       const response = await apiService.getRecentChats();
+      console.log('Recent chats response:', response); // Debug log
       if (response.success) {
         setRecentChats(response.data || []);
       }
@@ -60,6 +63,50 @@ const ChatDropdown = () => {
     return message.length > maxLength ? message.substring(0, maxLength) + '...' : message;
   };
 
+  useEffect(() => {
+    if (socket) {
+      socket.on('messageReceived', (newMessage) => {
+        setRecentChats((prevChats) => {
+          const updatedChats = prevChats.map((chat) => {
+            if (chat.userId === newMessage.senderId) {
+              return {
+                ...chat,
+                lastMessage: newMessage.text,
+                lastMessageTime: newMessage.timestamp,
+                hasUnread: true,
+              };
+            }
+            return chat;
+          });
+
+          // Add new chat if not already in the list
+          const existingChat = updatedChats.find((chat) => chat.userId === newMessage.senderId);
+          if (!existingChat) {
+            updatedChats.unshift({
+              userId: newMessage.senderId,
+              firstName: newMessage.senderName,
+              lastMessage: newMessage.text,
+              lastMessageTime: newMessage.timestamp,
+              hasUnread: true,
+            });
+          }
+
+          return updatedChats.sort((a, b) => new Date(b.lastMessageTime) - new Date(a.lastMessageTime));
+        });
+      });
+    }
+
+    return () => {
+      if (socket) {
+        socket.off('messageReceived');
+      }
+    };
+  }, [socket]);
+
+  const navigateToChats = () => {
+    window.location.href = '/chats';
+  };
+
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Chat Button - Responsive */}
@@ -90,9 +137,12 @@ const ChatDropdown = () => {
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-800">Messages</h3>
               <Link 
-                to="/chat" 
+                to="/chats" 
                 className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsOpen(false);
+                  navigateToChats();
+                }}
               >
                 See All
               </Link>

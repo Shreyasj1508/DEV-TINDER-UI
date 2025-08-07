@@ -4,6 +4,7 @@ import { createSocketConnection } from "../utils/socket";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
+import VideoCall from "./VideoCall";
 
 const Chat = () => {
   const { targetUserId } = useParams();
@@ -18,6 +19,8 @@ const Chat = () => {
   const [onlineUsers, setOnlineUsers] = useState(new Set());
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
+  const [showVideoCall, setShowVideoCall] = useState(false);
+  const [videoCallInitiator, setVideoCallInitiator] = useState(false);
   
   const user = useSelector((store) => store.user);
   const connections = useSelector((store) => store.connections);
@@ -189,16 +192,6 @@ const Chat = () => {
       lastName: userData.lastName || ""
     });
 
-    // Add message to UI immediately for better UX (match backend structure)
-    const tempId = Date.now().toString();
-    setMessages((prevMessages) => [...prevMessages, {
-      messageId: tempId,
-      senderId: userId,
-      senderName: `${userData.firstName} ${userData.lastName || ''}`.trim(),
-      text: newMessage.trim(),
-      createdAt: new Date(),
-    }]);
-
     setNewMessage("");
   };
 
@@ -319,7 +312,7 @@ const Chat = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
                 </button>
-                <button className="text-white hover:bg-white/20 p-2 rounded-lg transition-colors">
+                <button className="text-white hover:bg-white/20 p-2 rounded-lg transition-colors" onClick={() => { setShowVideoCall(true); setVideoCallInitiator(true); }} title="Start Video Call">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                   </svg>
@@ -328,6 +321,14 @@ const Chat = () => {
             </div>
           </div>
           
+          {/* Video Call Overlay */}
+          {showVideoCall && (
+            <VideoCall
+              roomId={`chat-${userId}-${targetUserId}`}
+              onClose={() => setShowVideoCall(false)}
+              isInitiator={videoCallInitiator}
+            />
+          )}
           {/* Messages Container */}
           <div className="h-[60vh] overflow-y-auto p-4 bg-gray-50">
             {messages.length === 0 ? (

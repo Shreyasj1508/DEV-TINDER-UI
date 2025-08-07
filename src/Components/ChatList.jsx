@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import { apiService } from '../utils/apiService';
+import { useSocket } from '../utils/socket';
 
 const ChatList = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [recentChats, setRecentChats] = useState([]);
   const [loading, setLoading] = useState(true);
+  const socket = useSocket();
 
   useEffect(() => {
     const fetchRecentChats = async () => {
@@ -23,6 +25,45 @@ const ChatList = () => {
     fetchRecentChats();
   }, []);
 
+  useEffect(() => {
+    if (socket) {
+      socket.on('messageReceived', (newMessage) => {
+        setRecentChats((prevChats) => {
+          const updatedChats = prevChats.map((chat) => {
+            if (chat.userId === newMessage.senderId) {
+              return {
+                ...chat,
+                lastMessage: newMessage.text,
+                lastMessageTime: newMessage.timestamp,
+                hasUnread: true,
+              };
+            }
+            return chat;
+          });
+
+          // Add new chat if not already in the list
+          const existingChat = updatedChats.find((chat) => chat.userId === newMessage.senderId);
+          if (!existingChat) {
+            updatedChats.unshift({
+              userId: newMessage.senderId,
+              firstName: newMessage.senderName,
+              lastMessage: newMessage.text,
+              lastMessageTime: newMessage.timestamp,
+              hasUnread: true,
+            });
+          }
+
+          return updatedChats.sort((a, b) => new Date(b.lastMessageTime) - new Date(a.lastMessageTime));
+        });
+      });
+    }
+
+    return () => {
+      if (socket) {
+        socket.off('messageReceived');
+      }
+    };
+  }, [socket]);
 
   // Sort: unread chats first, then by most recent message
   const sortedChats = [...recentChats].sort((a, b) => {

@@ -1,5 +1,6 @@
 import io from "socket.io-client";
 import { BASE_URL } from "./constants";
+import { useEffect, useState } from "react";
 
 export const createSocketConnection = () => {
   if (location.hostname === "localhost") {
@@ -7,4 +8,19 @@ export const createSocketConnection = () => {
   } else {
     return io("/", { path: "/api/socket.io" });
   }
+};
+
+export const useSocket = () => {
+  const [socket, setSocket] = useState(null);
+
+  useEffect(() => {
+    const socketInstance = createSocketConnection();
+    setSocket(socketInstance);
+
+    return () => {
+      socketInstance.disconnect();
+    };
+  }, []);
+
+  return socket;
 };
