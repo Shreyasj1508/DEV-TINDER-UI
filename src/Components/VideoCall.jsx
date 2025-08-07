@@ -13,11 +13,6 @@ const VideoCall = ({ roomId, onClose, isInitiator }) => {
   const [callStart, setCallStart] = useState(null);
   const [duration, setDuration] = useState('00:00');
   const [connected, setConnected] = useState(false);
-  // Example avatars/names, replace with real data if available
-  const myAvatar = 'https://ui-avatars.com/api/?name=You&background=0072ff&color=fff';
-  const partnerAvatar = 'https://ui-avatars.com/api/?name=Partner&background=00c6ff&color=fff';
-  const myName = 'You';
-  const partnerName = 'Partner';
 
   useEffect(() => {
     setTimeout(() => setVisible(true), 10);
@@ -38,7 +33,9 @@ const VideoCall = ({ roomId, onClose, isInitiator }) => {
           socket.emit('video-signal', { roomId, signal: data });
         });
         socket.on('video-signal', ({ signal }) => {
-          peerRef.current.signal(signal);
+          if (peerRef.current) {
+            peerRef.current.signal(signal);
+          }
         });
         // Remote stream
         peerRef.current.on('stream', remoteStream => {
@@ -49,13 +46,17 @@ const VideoCall = ({ roomId, onClose, isInitiator }) => {
           setConnected(true);
           setCallStart(Date.now());
         });
+      })
+      .catch((error) => {
+        console.error("Error accessing media devices:", error);
       });
+
     return () => {
-      if (peerRef.current) peerRef.current.destroy();
-      if (stream) stream.getTracks().forEach(track => track.stop());
-      socket.off('video-signal');
+      if (peerRef.current) {
+        peerRef.current.destroy();
+      }
     };
-  }, []);
+  }, [isInitiator, roomId, socket]);
 
   // Call duration timer
   useEffect(() => {
@@ -68,6 +69,7 @@ const VideoCall = ({ roomId, onClose, isInitiator }) => {
     }, 1000);
     return () => clearInterval(interval);
   }, [callStart]);
+
   return (
     <div style={{
       position: 'fixed',
@@ -104,22 +106,15 @@ const VideoCall = ({ roomId, onClose, isInitiator }) => {
         position: 'relative'
       }}>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
-          <img src={myAvatar} alt="You" style={{ width: 64, height: 64, borderRadius: '50%', boxShadow: '0 2px 8px #0006', position: 'absolute', top: -80, left: '50%', transform: 'translateX(-50%)' }} />
-          <div style={{ color: '#fff', fontWeight: 500, fontSize: 18, letterSpacing: 1, marginBottom: 8, textShadow: '0 2px 8px #0008', marginTop: -8 }}>{myName}</div>
           <video ref={myVideo} autoPlay muted style={{ width: '22vw', minWidth: 180, maxWidth: 320, height: '28vh', borderRadius: 24, marginBottom: 16, background: '#222', boxShadow: '0 4px 24px #0006' }} />
         </div>
         <div style={{ flex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
-          <img src={partnerAvatar} alt="Partner" style={{ width: 64, height: 64, borderRadius: '50%', boxShadow: '0 2px 8px #0006', position: 'absolute', top: -80, left: '50%', transform: 'translateX(-50%)' }} />
-          <div style={{ color: '#fff', fontWeight: 500, fontSize: 18, letterSpacing: 1, marginTop: -8, marginBottom: 8, textShadow: '0 2px 8px #0008' }}>{partnerName}</div>
           <video ref={remoteVideo} autoPlay style={{ width: '40vw', minWidth: 320, maxWidth: 600, height: '40vh', borderRadius: 24, background: '#222', boxShadow: '0 4px 32px #0008' }} />
         </div>
         {/* Connection status and duration */}
         <div style={{ position: 'absolute', bottom: 24, left: '50%', transform: 'translateX(-50%)', color: '#fff', fontWeight: 500, fontSize: 18, background: 'rgba(0,0,0,0.4)', padding: '8px 24px', borderRadius: 16, boxShadow: '0 2px 8px #0006', letterSpacing: 1 }}>
           {connected ? `Connected • ${duration}` : 'Connecting...'}
         </div>
-      </div>
-      <div style={{ color: '#fff', marginTop: 32, fontSize: 28, fontWeight: 600, letterSpacing: 2, textShadow: '0 2px 12px #0008' }}>
-        <span style={{ background: 'linear-gradient(90deg, #00c6ff 0%, #0072ff 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Live Video Call</span>
       </div>
     </div>
   );
