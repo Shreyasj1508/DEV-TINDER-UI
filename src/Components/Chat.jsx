@@ -66,7 +66,7 @@ const Chat = () => {
         withCredentials: true,
       });
 
-      const chatMessages = chat?.data?.messages.map((msg) => {
+      const chatMessages = chat?.data?.data?.messages?.map((msg) => {
         const { senderId, text, createdAt } = msg;
         return {
           _id: msg._id,
@@ -115,17 +115,17 @@ const Chat = () => {
 
     // Listen for various socket events
     socketConnection.on("messageReceived", ({ senderId, senderName, text, messageId, createdAt }) => {
+      console.log('Received message from socket:', { senderId, senderName, text, messageId, createdAt });
       const newMsg = {
-        _id: messageId,
+        messageId,
         senderId,
         senderName,
         text,
         createdAt: new Date(createdAt),
       };
-      
       setMessages((prevMessages) => {
         // Avoid duplicate messages
-        const exists = prevMessages.some(msg => msg._id === messageId);
+        const exists = prevMessages.some(msg => msg.messageId === messageId);
         if (exists) return prevMessages;
         return [...prevMessages, newMsg];
       });
@@ -179,28 +179,26 @@ const Chat = () => {
 
   const sendMessage = () => {
     if (!socket || !newMessage.trim() || !isConnected) return;
-    
-    const messageId = Date.now().toString();
-    const messageData = {
-      messageId,
-      senderId: userId,
-      senderName: `${userData.firstName} ${userData.lastName || ''}`.trim(),
+
+    // Send message with backend-compatible keys
+    socket.emit("sendMessage", {
+      userId,
       targetUserId,
       text: newMessage.trim(),
-      createdAt: new Date(),
-    };
-    
-    socket.emit("sendMessage", messageData);
-    
-    // Add message to UI immediately for better UX
+      firstName: userData.firstName,
+      lastName: userData.lastName || ""
+    });
+
+    // Add message to UI immediately for better UX (match backend structure)
+    const tempId = Date.now().toString();
     setMessages((prevMessages) => [...prevMessages, {
-      _id: messageId,
+      messageId: tempId,
       senderId: userId,
-      senderName: messageData.senderName,
+      senderName: `${userData.firstName} ${userData.lastName || ''}`.trim(),
       text: newMessage.trim(),
       createdAt: new Date(),
     }]);
-    
+
     setNewMessage("");
   };
 
@@ -345,9 +343,8 @@ const Chat = () => {
                   const isCurrentUser = userId === msg.senderId;
                   const showTime = index === 0 || 
                     (new Date(messages[index].createdAt) - new Date(messages[index-1].createdAt)) > 300000; // 5 minutes
-                  
                   return (
-                    <div key={msg._id || index}>
+                    <div key={msg.messageId || msg._id || index}>
                       {showTime && (
                         <div className="text-center my-4">
                           <span className="text-xs text-gray-500 bg-gray-200 px-3 py-1 rounded-full">
@@ -355,7 +352,6 @@ const Chat = () => {
                           </span>
                         </div>
                       )}
-                      
                       <div className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-2`}>
                         <div className={`max-w-[70%] ${isCurrentUser ? 'order-2' : 'order-1'}`}>
                           <div className={`rounded-2xl px-4 py-3 shadow-sm ${

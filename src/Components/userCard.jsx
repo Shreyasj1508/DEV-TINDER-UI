@@ -39,38 +39,29 @@ const UserCard = ({ user, onSwipe }) => {
 
   const handleSendRequest = async (status, userId) => {
     if (isAnimating) return;
-    
-    // If we have callback functions from Feed, use them for better animations
-    if (onSwipe) {
-      if (status === "ignored") {
-        onSwipe("left", userId);
-      } else if (status === "interested") {
-        onSwipe("right", userId);
-      }
-      return;
-    }
-    
-    // Fallback to direct API call if no callbacks provided
     setIsAnimating(true);
-    setError(null);
-    
-    try {
-      console.log(`Sending ${status} request for user ${userId}`);
-      const response = await apiService.sendConnectionRequest(status, userId);
-      
-      if (response.success) {
-        console.log(`${status} request successful, removing user from feed`);
-        dispatch(removeUserFromFeed(userId));
-      } else {
-        console.log(`${status} request failed:`, response);
-        setError(`Failed to send ${status} request`);
-        setIsAnimating(false);
-      }
-    } catch (err) {
-      console.error("Error sending request:", err);
-      setError(err.message);
-      setIsAnimating(false);
+    // Always swipe/remove card immediately
+    if (onSwipe) {
+      onSwipe(status === "interested" ? "right" : "left", userId);
+    } else {
+      dispatch(removeUserFromFeed(userId));
     }
+    // Fire API call in background, log errors but do not block UI
+    apiService.sendConnectionRequest(status, userId)
+      .then((response) => {
+        if (!response.success) {
+          const msg = response.data?.message || '';
+          if (!(msg.includes('already exists') || msg.includes('pending'))) {
+            console.warn('Request failed:', msg || `Failed to send ${status} request`);
+          }
+        }
+      })
+      .catch((err) => {
+        const msg = err.message || '';
+        if (!(msg.includes('already exists') || msg.includes('pending'))) {
+          console.warn('Request error:', msg || `Failed to send ${status} request`);
+        }
+      });
   };
 
   return (
@@ -276,11 +267,7 @@ const UserCard = ({ user, onSwipe }) => {
           </div>
         )}
 
-        {error && (
-          <div className="mt-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded-lg text-sm">
-            {error}
-          </div>
-        )}
+        {/* No error message for like/pass actions; errors are logged only */}
       </div>
     </div>
   );

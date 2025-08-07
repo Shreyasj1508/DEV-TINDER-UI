@@ -1,20 +1,68 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
 import { removeUser } from "../utils/userSlice";
 import { apiService } from "../utils/apiService";
 import { useRequestsCount } from "../utils/useRequestsCount";
 import NotificationBadge from "./NotificationBadge";
 import ChatDropdown from "./ChatDropdown";
+import { createSocketConnection } from "../utils/socket";
 
 const NavBar = () => {
   const user = useSelector((store) => store.user);
+  // Handle both direct user object and API response wrapped user object
+  const userData = user?.data ? user.data : user;
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+
   const { requestsCount } = useRequestsCount();
 
+  // Chat unread count state
+  const [unreadChatCount, setUnreadChatCount] = useState(0);
+  const socketRef = useRef(null);
+
+  // Fetch unread chat count from /chat/recent
+  const fetchUnreadChatCount = async () => {
+    try {
+      const res = await apiService.getRecentChats();
+      if (Array.isArray(res.data)) {
+        // Count number of chats with unread messages
+        const chatsWithUnread = res.data.filter(chat => (chat.unreadCount || 0) > 0).length;
+        setUnreadChatCount(chatsWithUnread);
+      } else {
+        setUnreadChatCount(0);
+      }
+    } catch (e) {
+      setUnreadChatCount(0);
+    }
+  };
+
+  // Setup socket for real-time updates
+  useEffect(() => {
+    if (!userData?._id) return;
+    fetchUnreadChatCount();
+    // Only create socket once
+    if (!socketRef.current) {
+      socketRef.current = createSocketConnection();
+    }
+    const socket = socketRef.current;
+    // Join global room for this user (if needed)
+    socket.emit("joinNotifications", { userId: userData._id });
+    // Listen for new chat messages
+    socket.on("messageReceived", () => {
+      fetchUnreadChatCount();
+    });
+    return () => {
+      if (socket) {
+        socket.off("messageReceived");
+      }
+    };
+    // eslint-disable-next-line
+  }, [userData?._id]);
+
   // Handle both direct user object and API response wrapped user object
-  const userData = user?.data ? user.data : user;
+
 
   const handleLogout = async () => {
     try {
@@ -114,8 +162,6 @@ const NavBar = () => {
                 {isActive("/connections") && <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-pink-500 rounded-full animate-bounce"></div>}
               </Link>
 
-              {/* Chat Dropdown - Responsive */}
-              <ChatDropdown />
 
               <Link
                 to="/chats"
@@ -139,6 +185,7 @@ const NavBar = () => {
                   />
                 </svg>
                 <span className="font-medium">Chats</span>
+                <NotificationBadge count={unreadChatCount} />
                 {(isActive("/chats") || location.pathname.startsWith("/chat/")) && <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-pink-500 rounded-full animate-bounce"></div>}
               </Link>
 

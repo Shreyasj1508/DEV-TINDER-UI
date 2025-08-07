@@ -1,12 +1,15 @@
 import { useDispatch, useSelector } from "react-redux";
 import { addRequests, removeRequest } from "../utils/requestSlice";
 import { addConnections, addConnection } from "../utils/connectionSlice";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { apiService } from "../utils/apiService";
 import LoadingSpinner from "./LoadingSpinner";
+import { createSocketConnection } from "../utils/socket";
+import { SOCKET_EVENTS } from "../utils/socketEvents";
 
 const Requests = () => {
   const requests = useSelector((store) => store.requests);
+  const user = useSelector((store) => store.user);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -60,7 +63,7 @@ const Requests = () => {
       setLoading(true);
       setError(null);
       const response = await apiService.getReceivedRequests();
-      
+      console.log('[DEBUG] getReceivedRequests response:', response);
       if (response.success) {
         dispatch(addRequests(response.data));
       }
@@ -72,9 +75,40 @@ const Requests = () => {
     }
   };
 
+  // Socket.io: Listen for new requests in real time
+  const socketRef = useRef(null);
   useEffect(() => {
     fetchRequests();
-  }, []);
+
+    // Connect socket if not already connected
+    if (!socketRef.current) {
+      socketRef.current = createSocketConnection();
+    }
+    const socket = socketRef.current;
+
+    // Register user for real-time events
+    if (user && user._id) {
+      console.log('[SOCKET DEBUG] Registering socket for user:', user._id);
+      socket.emit("register", user._id);
+    } else {
+      console.log('[SOCKET DEBUG] No user or user._id found for socket registration');
+    }
+
+    // Listen for new_request event
+    socket.on(SOCKET_EVENTS.NEW_REQUEST, () => {
+      console.log('[SOCKET DEBUG] Received new_request event');
+      fetchRequests();
+    });
+
+    // Cleanup on unmount
+    return () => {
+      if (socket) {
+        socket.off(SOCKET_EVENTS.NEW_REQUEST);
+        socket.disconnect();
+        socketRef.current = null;
+      }
+    };
+  }, [user]);
 
   if (loading) {
     return (

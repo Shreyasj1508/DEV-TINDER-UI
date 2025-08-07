@@ -407,6 +407,8 @@ const Feed = () => {
   const currentUser = filteredFeed[0];
   if (!currentUser) return null;
 
+
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-50 to-indigo-100 relative overflow-hidden">
       {/* Enhanced Background Pattern with More Elements */}
@@ -529,7 +531,17 @@ const Feed = () => {
             }`}
           >
             <div className="drop-shadow-2xl hover:drop-shadow-xl transition-all duration-300 relative group">
-              <UserCard user={currentUser} onSwipe={handleSwipe} />
+              <UserCard user={currentUser} onSwipe={(direction, userId) => {
+                // Animate, then remove from feed
+                if (isAnimating) return;
+                setAnimationDirection(direction);
+                setIsAnimating(true);
+                setTimeout(() => {
+                  dispatch(removeUserFromFeed(userId));
+                  setIsAnimating(false);
+                  setAnimationDirection(null);
+                }, 500);
+              }} />
             </div>
           </div>
         </div>
